@@ -226,16 +226,6 @@
                         <strong>Target Images:</strong> cathedral, monastery, tobolsk
                     </p>
                     
-                    <div>
-                        Insert your results here. For each image, show:
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li>Before alignment (separate R, G, B channels)</li>
-                            <li>After alignment (combined RGB image)</li>
-                            <li>Alignment offsets found (e.g., "G offset: (3, -2), R offset: (5, 1)")</li>
-                        </ul>
-                        Replace the image placeholders below with your actual results.
-                    </div>
-                    
                     <h4 style="margin-top: 25px; margin-bottom: 15px;">Cathedral</h4>
                     <div class="comparison">
                         <div class="image-container">
@@ -245,6 +235,8 @@
                         <div class="image-container">
                             <p><strong>Aligned Result</strong></p>
                             <img src="1.png" alt="Cathedral aligned">
+
+                            <p>Green Offset: (5, 2), Red Offset: (12, 3)</p>
                         </div>
                     </div>
                     
@@ -257,6 +249,7 @@
                         <div class="image-container">
                             <p><strong>Aligned Result</strong></p>
                             <img src="2.png" alt="Monastery aligned">
+                            <p>Green Offset: (-3, 2), Red Offset: (3, 2)</p>
                         </div>
                     </div>
                     
@@ -269,6 +262,7 @@
                         <div class="image-container">
                             <p><strong>Aligned Result</strong></p>
                             <img src="3.png" alt="Tobolsk aligned">
+                            <p>Green Offset: (3, 3), Red Offset: (6, 3)</p>
                         </div>
                     </div>
                 </div>
@@ -276,12 +270,11 @@
                 <div class="subsection">
                     <h3>Analysis</h3>
                     <div class="todo">
-                        Discuss your single-scale results:
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li>Did the alignment work well on all three images?</li>
-                            <li>Were there any challenges or unexpected results?</li>
-                            <li>Why might single-scale alignment fail on larger images?</li>
-                        </ul>
+                        The alignment results for the provided images were successful, with the channels aligning correctly to produce a coherent color image.
+                        For these png images, the single-scale alignment method was sufficient due to the relatively small offsets and consistent lighting conditions. 
+                        There weren't really significant lighting issues so I didn't have to use NCC for this part, and I decided to L2 for simplicity and speed.
+                        And because the picutres are realitivily small, the exhaustive search worked well, because I only needed to go through a range of [-15, 15] pixels. 
+                        The results were visually pleasing and met the project requirements.
                     </div>
                 </div>
             </section>
