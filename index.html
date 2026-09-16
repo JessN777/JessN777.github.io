@@ -286,26 +286,20 @@
                 <div class="subsection">
                     <h3>Motivation & Approach</h3>
                     <div>
-                        Since the TIF files are thousands of pixels wide, a brute-force exhaustive search over the full range would be computationally prohibitive. I implemented a multi-scale pyramid alignment approach: I recursively downscale
+                        Since the TIF files are thousands of pixels wide, a brute-force exhaustive search over the full range would be computationally expensive. I implemented a multi-scale pyramid alignment approach: I recursively downscale
                         each image by 0.5 until it reaches 300 pixels in height. At the coarsest level, I perform an exhaustive search over [-15, 15] pixels. Since the displacement scales proportionally with image size, this search range captures 
                         much larger actual displacements at coarser scales. I then propagate the estimated offset up the pyramid, doubling it at each level and refining it locally with a [-15, 15] search. This coarse-to-fine strategy is 
-                        much faster than searching the full range at full resolution.For this part of the project, I used a mix of NCC and L2, originally I started with L2, but with certain
-                        pictures the L2 minimuization would fail, because the L2 is not robust to brightness variations, so I switched to NCC for a couple of the images. The reason I choose not to have
-                        NCC for all the images is because NCC is computationally expensive, if it took 1 minute for L2 to align a picture, I found that it would take NCC 4-5 minutes, so if the pictures were much bigger than
-                        the NCC would take even more time, so I decided to use L2 first and final all the alignments that didn't have as many brightness variations, and then I used NCC for all the images that didn't align with L2.
-
+                        much faster than searching the full range at full resolution.
                     </div>
                 </div>
  
                 <div class="subsection">
                     <h3>Scoring Metric: NCC vs L2</h3>
-                    <div class="todo">
-                        Explain which metric you used (NCC or L2) and why:
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li><strong>L2 (Sum of Squared Differences):</strong> Simple, measures pixel intensity differences</li>
-                            <li><strong>NCC (Normalized Cross-Correlation):</strong> More robust to brightness variations, scale-invariant</li>
-                            <li>Did you try both? Which performed better and why?</li>
-                        </ul>
+                    <div">
+                        For this part of the project, I used a mix of NCC and L2, originally I started with L2, but with certain
+                        pictures the L2 minimization would fail, because the L2 is not robust to brightness variations, so I switched to NCC for a couple of the images. The reason I chose not to have
+                        NCC for all the images is because NCC is computationally expensive, if it took 1 minute for L2 to align a picture, I found that it would take NCC 4-5 minutes, so if the pictures were much bigger than
+                        the NCC would take even more time, so I decided to use L2 first and final all the alignments that didn't have as many brightness variations, and then I used NCC for all the images that didn't align with L2.
                     </div>
                     
                     <div class="metric-box">
