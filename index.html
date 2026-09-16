@@ -319,23 +319,9 @@
                 </div>
  
                 <div class="subsection">
-                    <h3>Algorithm Details</h3>
-                    <div class="todo">
-                        Walk through your implementation step-by-step:
-                        <ol style="margin-left: 20px; margin-top: 10px;">
-                            <li>How do you build the image pyramid?</li>
-                            <li>Start at which level? Why?</li>
-                            <li>How do you search for offsets at each level?</li>
-                            <li>How do you use coarser-level results to guide finer levels?</li>
-                            <li>What's your termination condition?</li>
-                        </ol>
-                    </div>
-                </div>
- 
-                <div class="subsection">
                     <h3>Results on All 17 Images</h3>
                     <p>
-                        <strong>Test Set:</strong> 14 provided images + 3 custom images you selected
+                        <strong>Test Set:</strong> 14 provided images + 3 custom images
                     </p>
                     
                     <h4 style="margin-top: 25px; margin-bottom: 15px; color: #333;">Sample Results Grid</h4>
@@ -442,14 +428,13 @@
  
                 <div class="subsection">
                     <h3>Analysis & Insights</h3>
-                    <div class="todo">
-                        Discuss your multi-scale results:
+                    <div >
                         <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li>How many images aligned without defects? (Goal: ≥16/17 for full credit)</li>
-                            <li>Which images were hardest to align and why?</li>
-                            <li>Did NCC/L2 choice matter for certain images?</li>
-                            <li>Did pyramid levels help find large offsets?</li>
-                            <li>Any edge cases or interesting failures?</li>
+                            I was able to align all the images with an serious defects, the images that I found were hardest to align were the Melons and the Generations
+                            I found that those two I wasn't able to align with just the L2 norm instead I have to switch to NCC in order to score and minimize. Another one
+                            That I found hard to align was Emir because the bright blue robes had trouble with aligning for the pyramid but for that one I decided to use a
+                            Exhaustive Search in a finite pixel size in order to find the alignment, but for most of the pictures it would have had to compute too much in order to
+                            find the aalignment.
                         </ul>
                     </div>
                 </div>
@@ -457,11 +442,7 @@
  
             <!-- CUSTOM IMAGES SECTION -->
             <section>
-                <h2>Custom Images (3 Required)</h2>
-                <p>
-                    You need to select or create 3 custom images to align. These can be digitized plates 
-                    in the same format (three channels stacked vertically) or images you create yourself.
-                </p>
+                <h2>Custom Images</h2>
                 
                 <div>
                     <ul style="margin-left: 20px; margin-top: 10px;">
