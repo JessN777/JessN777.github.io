@@ -183,6 +183,7 @@
         <header>
             <h1>Image Alignment using Pyramid Structures</h1>
             <p>CS180 Project 1 - Fall 2026</p>
+            <p><strong>By: Jessica Nguyen</strong></p>
         </header>
         
         <div class="content">
@@ -477,10 +478,10 @@
                 <h2>Key Insights & Lessons</h2>
                 <div class="subsection">
                     <div>
-                        It was interesting to learn about some of the history of pictures and then how many photographers in the past used to do the calculations in order to find
-                        the alignments in order to get the full color pictures that we take for granted today. It's interested to understand how much more complex the mathematics
-                        is for taking colorful photo. Certain images like melons.tif had features that were difficult to align with L2 due to brightness variations between color channels.
-                        The pyramid approach dramatically reduced computation by starting with small, downsampled images where large displacements become proportionally smaller. 
+                        It was fascinating to learn about the history of color photography and realize that photographers like Prokudin-Gorskii manually performed the alignment 
+                        calculations we now automate. Understanding the mathematical complexity behind what we take for granted today was eye-opening. Certain images like 
+                        melons.tif had features that were difficult to align with L2 due to brightness variations between color channels. The pyramid approach 
+                        dramatically reduced computation by starting with small, downsampled images where large displacements become proportionally smaller. 
                         A 100-pixel displacement at full resolution becomes 50 pixels at 0.5 scale, 25 pixels at 0.25 scale, and so on. This allowed me to use a small search range 
                         (±15 pixels) at each level while still capturing large displacements. I discovered that different images needed different approaches. L2 worked well for
                         most images but failed spectacularly on those with significant brightness differences between channels. NCC solved this but was 4-5× slower.
