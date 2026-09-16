@@ -217,7 +217,9 @@
                         through a range of [-15, 15] pixels in both x and y directions for the green and red channels relative to the blue channel.
                         The alignment was scored using the L2 norm (sum of squared differences) to find the best offsets that minimized the difference
                         between the channels. The reason I chose the L2 norm is that it is simple to compute and effective for images with consistent lighting 
-                        and contrast, this allowed for a fast computation time.
+                        and contrast, this allowed for a fast computation time. One of the challenges I faced was the problem with the edges of the images, since the
+                        edges of the images were dark boarders the search would sometimes find offsets that aligned the edges of the images, but not the actual content of the images,
+                        so I decided to crop the images by 10% on each side to avoid this issue.
                 </div>
  
                 <div class="subsection">
@@ -346,21 +348,21 @@
                         <div class="image-container">
                             <p><strong>Cathedral</strong></p>
                             <img src="PLACEHOLDER_pyramid_cathedral.jpg" alt="Cathedral pyramid result">
-                            <p>G: (3, -2), R: (5, 1)</p>
+                            <p>G: (5, 2), R: (12, 3)</p>
                         </div>
                         
                         <!-- Image 2 -->
                         <div class="image-container">
                             <p><strong>Monastery</strong></p>
                             <img src="PLACEHOLDER_pyramid_monastery.jpg" alt="Monastery pyramid result">
-                            <p>G: (-1, 2), R: (4, 0)</p>
+                            <p>G: (-3, 2), R: (3, 2)</p>
                         </div>
                         
                         <!-- Image 3 -->
                         <div class="image-container">
                             <p><strong>Tobolsk</strong></p>
                             <img src="PLACEHOLDER_pyramid_tobolsk.jpg" alt="Tobolsk pyramid result">
-                            <p>G: (2, 3), R: (6, -1)</p>
+                            <p>G: (3, 3), R: (6, 3)</p>
                         </div>
                         
                         <div class="todo">
