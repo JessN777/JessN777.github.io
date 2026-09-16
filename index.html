@@ -1,16 +1,458 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Portfolio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Project 1: Image Alignment</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        section {
+            margin-bottom: 50px;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .subsection {
+            margin-left: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .subsection h3 {
+            margin-top: 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .image-container {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .image-container p {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .metric-box {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #0288d1;
+        }
+        
+        .metric-box strong {
+            color: #0288d1;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .todo {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .todo::before {
+            content: "📝 TODO: ";
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to My CS180 Portfolio!</h1>
-    <a href="./1/index.html">Project 1</a>
+    <div class="container">
+        <header>
+            <h1>Image Alignment using Pyramid Structures</h1>
+            <p>CS180 Project 1 - Fall 2026</p>
+        </header>
+        
+        <div class="content">
+            <!-- OVERVIEW SECTION -->
+            <section>
+                <h2>Overview</h2>
+                <div class="subsection">
+                    <p>
+                        This project implements image alignment techniques to reconstruct color images from 
+                        digitized glass plate photographs. The Prokudin-Gorskii collection contains three 
+                        color-separated channels (red, green, blue) stacked vertically that need to be aligned 
+                        to create the final color image.
+                    </p>
+                    <p>
+                        <strong>Alignment Methods Implemented:</strong>
+                    </p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Single-Scale:</strong> Direct exhaustive search over shift offsets</li>
+                        <li><strong>Multi-Scale:</strong> Image pyramid with NCC/L2 scoring</li>
+                    </ul>
+                </div>
+            </section>
+ 
+            <!-- SINGLE-SCALE ALIGNMENT SECTION -->
+            <section>
+                <h2>Single-Scale Alignment</h2>
+                
+                <div class="subsection">
+                    <h3>Approach</h3>
+                    <div>
+                        For this part of the project for the single-scale alignment, I implemented an exhaustive search method that looked 
+                        through a range of [-15, 15] pixels in both x and y directions for the green and red channels relative to the blue channel.
+                        The alignment was scored using the L2 norm (sum of squared differences) to find the best offsets that minimized the difference
+                        between the channels. The reason I chose the L2 norm is that it is simple to compute and effective for images with consistent lighting 
+                        and contrast, this allowed for a fast computation time.
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Results on Provided Images</h3>
+                    <p>
+                        <strong>Target Images:</strong> cathedral, monastery, tobolsk
+                    </p>
+                    
+                    <div>
+                        Insert your results here. For each image, show:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Before alignment (separate R, G, B channels)</li>
+                            <li>After alignment (combined RGB image)</li>
+                            <li>Alignment offsets found (e.g., "G offset: (3, -2), R offset: (5, 1)")</li>
+                        </ul>
+                        Replace the image placeholders below with your actual results.
+                    </div>
+                    
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Cathedral</h4>
+                    <div class="comparison">
+                        <div class="image-container">
+                            <p><strong>Original (Misaligned)</strong></p>
+                            <img src="cathedral.jpg" alt="Cathedral original">
+                        </div>
+                        <div class="image-container">
+                            <p><strong>Aligned Result</strong></p>
+                            <img src="1.png" alt="Cathedral aligned">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Monastery</h4>
+                    <div class="comparison">
+                        <div class="image-container">
+                            <p><strong>Original (Misaligned)</strong></p>
+                            <img src="monastery.jpg" alt="Monastery original">
+                        </div>
+                        <div class="image-container">
+                            <p><strong>Aligned Result</strong></p>
+                            <img src="2.png" alt="Monastery aligned">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Tobolsk</h4>
+                    <div class="comparison">
+                        <div class="image-container">
+                            <p><strong>Original (Misaligned)</strong></p>
+                            <img src="obolsk.jpg" alt="Tobolsk original">
+                        </div>
+                        <div class="image-container">
+                            <p><strong>Aligned Result</strong></p>
+                            <img src="3.png" alt="Tobolsk aligned">
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Analysis</h3>
+                    <div class="todo">
+                        Discuss your single-scale results:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Did the alignment work well on all three images?</li>
+                            <li>Were there any challenges or unexpected results?</li>
+                            <li>Why might single-scale alignment fail on larger images?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+ 
+            <!-- MULTI-SCALE PYRAMID ALIGNMENT SECTION -->
+            <section>
+                <h2>Multi-Scale Pyramid Alignment (40 Points)</h2>
+                
+                <div class="subsection">
+                    <h3>Motivation & Approach</h3>
+                    <div class="todo">
+                        Explain your multi-scale approach thoroughly. Include:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Why image pyramids are necessary (larger images, larger offsets)</li>
+                            <li>How many pyramid levels you used</li>
+                            <li>How you downsample (e.g., rescale by 0.5)</li>
+                            <li>Why you start at coarse levels and refine</li>
+                            <li>How offset estimates propagate up the pyramid</li>
+                        </ul>
+                    </div>
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Scoring Metric: NCC vs L2</h3>
+                    <div class="todo">
+                        Explain which metric you used (NCC or L2) and why:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong>L2 (Sum of Squared Differences):</strong> Simple, measures pixel intensity differences</li>
+                            <li><strong>NCC (Normalized Cross-Correlation):</strong> More robust to brightness variations, scale-invariant</li>
+                            <li>Did you try both? Which performed better and why?</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="metric-box">
+                        <strong>NCC Formula:</strong> <code>NCC = sum((im1 - mean(im1)) * (im2 - mean(im2))) / (std(im1) * std(im2))</code>
+                        <br><br>
+                        <strong>L2 Formula:</strong> <code>L2 = sqrt(sum((im1 - im2)^2))</code>
+                    </div>
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Algorithm Details</h3>
+                    <div class="todo">
+                        Walk through your implementation step-by-step:
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>How do you build the image pyramid?</li>
+                            <li>Start at which level? Why?</li>
+                            <li>How do you search for offsets at each level?</li>
+                            <li>How do you use coarser-level results to guide finer levels?</li>
+                            <li>What's your termination condition?</li>
+                        </ol>
+                    </div>
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Results on All 17 Images</h3>
+                    <p>
+                        <strong>Test Set:</strong> 14 provided images + 3 custom images you selected
+                    </p>
+                    
+                    <div class="todo">
+                        Create a results table showing:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Image name</li>
+                            <li>Whether alignment succeeded or had defects</li>
+                            <li>G and R offsets found</li>
+                            <li>Final NCC/L2 score</li>
+                        </ul>
+                        Then display thumbnail or full images of your best results below.
+                    </div>
+                    
+                    <h4 style="margin-top: 25px; margin-bottom: 15px; color: #333;">Sample Results Grid</h4>
+                    <div class="image-grid">
+                        <!-- Image 1 -->
+                        <div class="image-container">
+                            <p><strong>Cathedral</strong></p>
+                            <img src="PLACEHOLDER_pyramid_cathedral.jpg" alt="Cathedral pyramid result">
+                            <p>G: (3, -2), R: (5, 1)</p>
+                        </div>
+                        
+                        <!-- Image 2 -->
+                        <div class="image-container">
+                            <p><strong>Monastery</strong></p>
+                            <img src="PLACEHOLDER_pyramid_monastery.jpg" alt="Monastery pyramid result">
+                            <p>G: (-1, 2), R: (4, 0)</p>
+                        </div>
+                        
+                        <!-- Image 3 -->
+                        <div class="image-container">
+                            <p><strong>Tobolsk</strong></p>
+                            <img src="PLACEHOLDER_pyramid_tobolsk.jpg" alt="Tobolsk pyramid result">
+                            <p>G: (2, 3), R: (6, -1)</p>
+                        </div>
+                        
+                        <div class="todo">
+                            Add your remaining 14 images here
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="subsection">
+                    <h3>Analysis & Insights</h3>
+                    <div class="todo">
+                        Discuss your multi-scale results:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>How many images aligned without defects? (Goal: ≥16/17 for full credit)</li>
+                            <li>Which images were hardest to align and why?</li>
+                            <li>Did NCC/L2 choice matter for certain images?</li>
+                            <li>Did pyramid levels help find large offsets?</li>
+                            <li>Any edge cases or interesting failures?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+ 
+            <!-- CUSTOM IMAGES SECTION -->
+            <section>
+                <h2>Custom Images (3 Required)</h2>
+                <p>
+                    You need to select or create 3 custom images to align. These can be digitized plates 
+                    in the same format (three channels stacked vertically) or images you create yourself.
+                </p>
+                
+                <div class="todo">
+                    Describe your 3 custom images:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Image 1:</strong> [Name, source, brief description]</li>
+                        <li><strong>Image 2:</strong> [Name, source, brief description]</li>
+                        <li><strong>Image 3:</strong> [Name, source, brief description]</li>
+                    </ul>
+                    Then show your alignment results for each below.
+                </div>
+                
+                <h3 style="margin-top: 25px;">Custom Image Results</h3>
+                <div class="image-grid">
+                    <div class="image-container">
+                        <p><strong>Custom Image 1</strong></p>
+                        <img src="PLACEHOLDER_custom1.jpg" alt="Custom image 1">
+                    </div>
+                    <div class="image-container">
+                        <p><strong>Custom Image 2</strong></p>
+                        <img src="PLACEHOLDER_custom2.jpg" alt="Custom image 2">
+                    </div>
+                    <div class="image-container">
+                        <p><strong>Custom Image 3</strong></p>
+                        <img src="PLACEHOLDER_custom3.jpg" alt="Custom image 3">
+                    </div>
+                </div>
+            </section>
+ 
+            <!-- KEY INSIGHTS SECTION -->
+            <section>
+                <h2>Key Insights & Lessons</h2>
+                <div class="subsection">
+                    <div class="todo">
+                        Reflect on what you learned:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>What made alignment difficult on certain images?</li>
+                            <li>How did pyramid levels improve alignment?</li>
+                            <li>Edge cases or surprising discoveries?</li>
+                            <li>Computational performance observations?</li>
+                            <li>What would you do differently next time?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+ 
+        <footer>
+            <p>CS180 Project 1 | Image Alignment | Fall 2026</p>
+        </footer>
+    </div>
 </body>
 </html>
