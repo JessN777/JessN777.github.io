@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 1 - Image Alignment using Pyramid Structures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .nav {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .nav a {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        .nav a:hover {
+            background: #764ba2;
+        }
+        section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .image-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .image-section img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html">← Back to CS180</a>
+            <a href="project2.html">Project 2 →</a>
+        </div>
+
+        <header>
+            <h1>Project 1: Image Alignment using Pyramid Structures</h1>
+            <p>CS180 Project 1 - Fall 2026</p>
+            <p>By: Jessica Nguyen</p>
+        </header>
+
+        <section>
+            <h2>Overview</h2>
+            <div class="info-box">
+                <p>Sergei Prokudin-Gorskii, a photographer working in the early 1900s, pioneered color photography in the Russian Empire at a time when color printing technology didn't yet exist. His technique involved photographing each scene three separate times, using red, green, and blue filters respectively, and recording all three exposures on a single glass plate.</p>
+                <p>The Library of Congress now preserves these digitized negatives, which are arranged with the three color separations stacked vertically — blue at the top, green in the middle, and red at the bottom. This project implements image alignment techniques to reconstruct color images from digitized glass plate photographs.</p>
+                <p><strong>Alignment Methods Implemented:</strong></p>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li><strong>Single-Scale:</strong> Direct exhaustive search over shift offsets</li>
+                    <li><strong>Multi-Scale:</strong> Image pyramid with NCC/L2 scoring</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Single-Scale Alignment</h2>
+            <h3>Approach</h3>
+            <p>For the single-scale alignment, I implemented an exhaustive search method that looked through a range of [-15, 15] pixels in both x and y directions for the green and red channels relative to the blue channel. The alignment was scored using the L2 norm (sum of squared differences) to find the best offsets that minimized the difference between channels.</p>
+            <p>The reason I chose the L2 norm is that it is simple to compute and effective for images with consistent lighting and contrast. This allowed for a fast computation time. One of the challenges I faced was the problem with the edges of the images, since the edges of the images were dark boarders, the search would sometimes find offsets that aligned the edges of the images, but not the actual content of the images. So I decided to crop the images by 10% on each side to avoid this issue.</p>
+
+            <h3>Results on Provided Images</h3>
+            <p><strong>Target Images:</strong> cathedral, monastery, tobolsk</p>
+
+            <div class="image-section">
+                <h4>Cathedral</h4>
+                <p><em>Original (Misaligned)</em></p>
+                <p>Alignment result shows the beautifully reconstructed cathedral with color channels properly aligned.</p>
+                <img src="cathedral.jpg" alt="Cathedral aligned result" style="max-width: 500px;">
+            </div>
+
+            <div class="image-section">
+                <h4>Monastery</h4>
+                <p><em>Original (Misaligned)</em></p>
+                <p>The monastery image demonstrates the effectiveness of pyramid-based alignment for larger scenes.</p>
+                <img src="monastery.jpg" alt="Monastery aligned result" style="max-width: 500px;">
+            </div>
+
+            <div class="image-section">
+                <h4>Obolsk</h4>
+                <p><em>Original (Misaligned)</em></p>
+                <p>The obolsk image shows excellent color reconstruction using the multi-scale approach.</p>
+                <img src="obolsk.jpg" alt="Obolsk aligned result" style="max-width: 500px;">
+            </div>
+        </section>
+
+        <section>
+            <h2>Multi-Scale Alignment (Image Pyramid)</h2>
+            <h3>Approach</h3>
+            <p>For better performance on larger images, I implemented a multi-scale approach using image pyramids. The algorithm:</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Builds Gaussian pyramids for each channel</li>
+                <li>Starts alignment at the coarsest scale</li>
+                <li>Progressively refines alignment at finer scales</li>
+                <li>Uses the coarse alignment as initialization for fine alignment</li>
+            </ul>
+            <p>This approach significantly speeds up computation for large images while maintaining alignment quality.</p>
+        </section>
+
+        <section>
+            <h2>Key Findings</h2>
+            <div class="info-box">
+                <ul style="margin-left: 20px;">
+                    <li>Pyramid-based alignment provides significant speedup over single-scale methods</li>
+                    <li>Cropping edges by ~10% prevents edge artifacts in alignment</li>
+                    <li>The L2 norm is effective for this task but can be sensitive to lighting variations</li>
+                    <li>Multi-scale approach handles images of varying sizes effectively</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Navigation</h2>
+            <p><a href="index.html">← Back to Main CS180 Page</a></p>
+            <p><a href="project2.html">→ Continue to Project 2</a></p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 CS180 - Computer Vision Course</p>
+        </footer>
+    </div>
+</body>
+</html>
