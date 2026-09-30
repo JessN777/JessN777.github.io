@@ -123,7 +123,7 @@
             <h2>Part 1: Filters and Edges</h2>
 
             <h3>Part 1.1: Convolutions from Scratch!</h3>
-            <p class="note">✏️ Explain your 4-loop and 2-loop convolutions, compare them with scipy.signal.convolve2d, comment on runtime, and describe how boundaries are handled (zero padding).</p>
+            <p class="note">I implemented 2D convolution two ways: with four nested loops (checking every output pixel and every kernel element) and with two loops (checking every output pixel but using NumPy to multiply the kernel and image patch all at once). Both flip the kernel before sliding it across the image, which is correct by definition. Both implementations have time complexity O(H × W × K²), since we process every output pixel and perform K² operations per pixel. The 2-loop version is faster in practice because NumPy's vectorized operations run in compiled C, while the 4-loop version executes K² separate Python multiplications per pixel.</p>
             <figure>
                 <img src="proj2/part_1_1_results.png" alt="Part 1.1 results">
                 <figcaption>My photo in grayscale, convolved with a 9×9 box filter, Dx = [1, −1], and Dy = [1, −1]ᵀ.</figcaption>
@@ -183,10 +183,6 @@
             <figure>
                 <img src="proj2/part_2_2_DerekPicture_nutmeg_fft.png" alt="Derek and Nutmeg Fourier transforms">
                 <figcaption>Log magnitude of the Fourier transforms of the inputs, filtered images, and hybrid.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_2_cat_dog.png" alt="Cat and dog hybrid">
-                <figcaption>My own hybrid: cat (high frequencies) + dog (low frequencies).</figcaption>
             </figure>
 
             <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
