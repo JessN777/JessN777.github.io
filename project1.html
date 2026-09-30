@@ -3,192 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project 1 - Image Alignment using Pyramid Structures</title>
+    <title>Image Alignment | Jessica Nguyen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #f7f8fb;
+            --surface: #ffffff;
+            --text: #1d2233;
+            --muted: #5f6781;
+            --border: #e4e7ef;
+            --accent: #4f5bd5;
+            --accent-soft: #eef0ff;
+            --green: #1f9d63;
+            --green-soft: #e6f6ee;
+            --red: #d6455d;
+            --red-soft: #fdecef;
+            --shadow: 0 1px 2px rgba(20,25,50,0.04), 0 8px 24px rgba(20,25,50,0.06);
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
+        a { color: var(--accent); text-decoration: none; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 10;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
         }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            text-align: center;
+        .topbar-inner {
+            max-width: 1080px; margin: 0 auto; padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
         }
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .brand { font-weight: 700; color: var(--text); }
+        .toc { display: flex; gap: 22px; font-size: 14px; flex-wrap: wrap; }
+        .toc a { color: var(--muted); font-weight: 500; }
+        .toc a:hover { color: var(--accent); }
+
+        .hero {
+            max-width: 1080px; margin: 0 auto; padding: 80px 24px 50px;
         }
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        .eyebrow {
+            display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
         }
-        .nav {
-            margin-bottom: 30px;
-            text-align: center;
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.1; font-weight: 800;
+            letter-spacing: -0.02em; max-width: 800px;
         }
-        .nav a {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background 0.3s;
+        .hero .lede { font-size: 1.15rem; color: var(--muted); max-width: 700px; margin-top: 20px; }
+        .meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 26px; color: var(--muted); font-size: 14px; }
+        .meta b { color: var(--text); font-weight: 600; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+        .tag {
+            font-size: 13px; font-weight: 500; padding: 5px 12px; border-radius: 999px;
+            background: var(--surface); border: 1px solid var(--border); color: var(--muted);
         }
-        .nav a:hover {
-            background: #764ba2;
+
+        .hero-img {
+            max-width: 1080px; margin: 0 auto; padding: 0 24px;
         }
-        section {
-            background: white;
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .hero-img .frame {
+            display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; align-items: center;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+            padding: 24px; box-shadow: var(--shadow);
         }
-        h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+        .hero-img .side { text-align: center; }
+        .hero-img .side img { max-height: 420px; max-width: 100%; border-radius: 8px; }
+        .hero-img .side span { display: block; font-size: 13px; color: var(--muted); margin-top: 10px; font-weight: 500; }
+        .hero-img .side.after img { max-height: 420px; }
+
+        .stats {
+            max-width: 1080px; margin: 40px auto 0; padding: 0 24px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
         }
-        h3 {
-            color: #764ba2;
-            margin-top: 20px;
-            margin-bottom: 15px;
+        .stat {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 20px; box-shadow: var(--shadow);
         }
-        .image-section {
-            margin: 20px 0;
-            text-align: center;
+        .stat .num { font-size: 1.8rem; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+        .stat .lbl { font-size: 14px; color: var(--muted); }
+
+        main { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
+        section { padding-top: 80px; }
+        .section-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+        h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin: 6px 0 18px; }
+        h3 { font-size: 1.2rem; font-weight: 700; margin: 34px 0 10px; }
+        .prose { max-width: 760px; color: #3a4057; }
+        .prose p { margin-bottom: 16px; }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            padding: 28px; box-shadow: var(--shadow);
         }
-        .image-section img {
-            max-width: 100%;
-            height: auto;
-            margin: 10px 0;
-            border-radius: 5px;
+
+        .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 28px; }
+        .step {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+            position: relative;
         }
-        .info-box {
-            background: #f0f7ff;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
+        .step .n {
+            width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
+            display: grid; place-items: center; font-size: 13px; font-weight: 700; margin-bottom: 10px;
         }
+        .step b { display: block; margin-bottom: 4px; }
+        .step p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+        .compare {
+            display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; align-items: center;
+            margin: 20px 0 10px;
+        }
+        .compare figure { text-align: center; }
+        .compare img { max-width: 100%; max-height: 380px; border-radius: 8px; cursor: zoom-in; }
+        .compare figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; font-weight: 500; }
+        .result-title { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .result-title h3 { margin: 0; }
+
+        .offsets { display: flex; gap: 8px; flex-wrap: wrap; }
+        .pill {
+            font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 500;
+            padding: 4px 10px; border-radius: 999px;
+        }
+        .pill.g { background: var(--green-soft); color: var(--green); }
+        .pill.r { background: var(--red-soft); color: var(--red); }
+
+        .stack > .card + .card { margin-top: 20px; }
+
+        .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+        .metric { border-radius: 14px; padding: 20px; border: 1px solid var(--border); background: var(--surface); }
+        .metric .name { font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .metric .badge { font-size: 12px; font-weight: 600; color: var(--muted); }
+        .metric code {
+            display: block; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            background: #f3f4f8; padding: 12px; border-radius: 8px; color: #333a55; overflow-x: auto;
+        }
+        .metric p { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+        .tile {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+            box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tile:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(20,25,50,0.1); }
+        .tile img { width: 100%; display: block; cursor: zoom-in; background: #fff; }
+        .tile .info { padding: 14px 16px 16px; border-top: 1px solid var(--border); }
+        .tile .info b { display: block; margin-bottom: 8px; font-size: 15px; }
+        .tile .note { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+        .callout {
+            border-left: 4px solid var(--accent); background: var(--accent-soft);
+            padding: 18px 22px; border-radius: 0 12px 12px 0; margin-top: 24px; color: #2f3660;
+        }
+
+        .takeaways { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+        .takeaway { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+        .takeaway b { display: block; margin-bottom: 6px; }
+        .takeaway p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
         footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            margin-top: 40px;
+            border-top: 1px solid var(--border); padding: 30px 24px; text-align: center;
+            color: var(--muted); font-size: 14px;
+        }
+        footer a { margin: 0 10px; font-weight: 500; }
+
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(10,12,25,0.88); display: none;
+            align-items: center; justify-content: center; z-index: 50; padding: 30px; cursor: zoom-out;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+
+        @media (max-width: 860px) {
+            .stats, .pipeline { grid-template-columns: repeat(2, 1fr); }
+            .gallery, .takeaways { grid-template-columns: repeat(2, 1fr); }
+            .metrics { grid-template-columns: 1fr; }
+            .toc { display: none; }
+        }
+        @media (max-width: 600px) {
+            .hero { padding: 50px 16px 36px; }
+            main, .stats, .hero-img { padding-left: 16px; padding-right: 16px; }
+            .gallery, .takeaways, .compare, .hero-img .frame { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="nav">
-            <a href="index.html">← Back to CS180</a>
-            <a href="project2.html">Project 2 →</a>
+    <nav class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="index.html">← Jessica Nguyen</a>
+            <div class="toc">
+                <a href="#overview">Overview</a>
+                <a href="#single">Single-Scale</a>
+                <a href="#pyramid">Pyramid</a>
+                <a href="#results">Results</a>
+                <a href="#custom">Custom</a>
+                <a href="#lessons">Lessons</a>
+            </div>
         </div>
+    </nav>
 
-        <header>
-            <h1>Project 1: Image Alignment using Pyramid Structures</h1>
-            <p>CS180 Project 1 - Fall 2026</p>
-            <p>By: Jessica Nguyen</p>
-        </header>
-
-        <section>
-            <h2>Overview</h2>
-            <div class="info-box">
-                <p>Sergei Prokudin-Gorskii, a photographer working in the early 1900s, pioneered color photography in the Russian Empire at a time when color printing technology didn't yet exist. His technique involved photographing each scene three separate times, using red, green, and blue filters respectively, and recording all three exposures on a single glass plate.</p>
-                <p>The Library of Congress now preserves these digitized negatives, which are arranged with the three color separations stacked vertically — blue at the top, green in the middle, and red at the bottom. This project implements image alignment techniques to reconstruct color images from digitized glass plate photographs.</p>
-                <p><strong>Alignment Methods Implemented:</strong></p>
-                <ul style="margin-top: 10px; margin-left: 20px;">
-                    <li><strong>Single-Scale:</strong> Direct exhaustive search over shift offsets</li>
-                    <li><strong>Multi-Scale:</strong> Image pyramid with NCC/L2 scoring</li>
-                </ul>
-            </div>
-        </section>
-
-        <section>
-            <h2>Single-Scale Alignment</h2>
-            <h3>Approach</h3>
-            <p>For the single-scale alignment, I implemented an exhaustive search method that looked through a range of [-15, 15] pixels in both x and y directions for the green and red channels relative to the blue channel. The alignment was scored using the L2 norm (sum of squared differences) to find the best offsets that minimized the difference between channels.</p>
-            <p>The reason I chose the L2 norm is that it is simple to compute and effective for images with consistent lighting and contrast. This allowed for a fast computation time. One of the challenges I faced was the problem with the edges of the images, since the edges of the images were dark boarders, the search would sometimes find offsets that aligned the edges of the images, but not the actual content of the images. So I decided to crop the images by 10% on each side to avoid this issue.</p>
-
-            <h3>Results on Provided Images</h3>
-            <p><strong>Target Images:</strong> cathedral, monastery, tobolsk</p>
-
-            <div class="image-section">
-                <h4>Cathedral</h4>
-                <p><em>Original (Misaligned)</em></p>
-                <p>Alignment result shows the beautifully reconstructed cathedral with color channels properly aligned.</p>
-                <img src="cathedral.jpg" alt="Cathedral aligned result" style="max-width: 500px;">
-            </div>
-
-            <div class="image-section">
-                <h4>Monastery</h4>
-                <p><em>Original (Misaligned)</em></p>
-                <p>The monastery image demonstrates the effectiveness of pyramid-based alignment for larger scenes.</p>
-                <img src="monastery.jpg" alt="Monastery aligned result" style="max-width: 500px;">
-            </div>
-
-            <div class="image-section">
-                <h4>Obolsk</h4>
-                <p><em>Original (Misaligned)</em></p>
-                <p>The obolsk image shows excellent color reconstruction using the multi-scale approach.</p>
-                <img src="obolsk.jpg" alt="Obolsk aligned result" style="max-width: 500px;">
-            </div>
-        </section>
-
-        <section>
-            <h2>Multi-Scale Alignment (Image Pyramid)</h2>
-            <h3>Approach</h3>
-            <p>For better performance on larger images, I implemented a multi-scale approach using image pyramids. The algorithm:</p>
-            <ul style="margin-left: 20px; margin-top: 10px;">
-                <li>Builds Gaussian pyramids for each channel</li>
-                <li>Starts alignment at the coarsest scale</li>
-                <li>Progressively refines alignment at finer scales</li>
-                <li>Uses the coarse alignment as initialization for fine alignment</li>
-            </ul>
-            <p>This approach significantly speeds up computation for large images while maintaining alignment quality.</p>
-        </section>
-
-        <section>
-            <h2>Key Findings</h2>
-            <div class="info-box">
-                <ul style="margin-left: 20px;">
-                    <li>Pyramid-based alignment provides significant speedup over single-scale methods</li>
-                    <li>Cropping edges by ~10% prevents edge artifacts in alignment</li>
-                    <li>The L2 norm is effective for this task but can be sensitive to lighting variations</li>
-                    <li>Multi-scale approach handles images of varying sizes effectively</li>
-                </ul>
-            </div>
-        </section>
-
-        <section>
-            <h2>Navigation</h2>
-            <p><a href="index.html">← Back to Main CS180 Page</a></p>
-            <p><a href="project2.html">→ Continue to Project 2</a></p>
-        </section>
-
-        <footer>
-            <p>&copy; 2026 CS180 - Computer Vision Course</p>
-        </footer>
+    <div class="hero">
+        <span class="eyebrow">CS180 · Computer Vision · Project 1</span>
+        <h1>Reconstructing 100-year-old color photos with image pyramids</h1>
+        <p class="lede">Automatically aligning the red, green, and blue glass-plate negatives of Sergei Prokudin-Gorskii to produce full-color images, using exhaustive search and a coarse-to-fine image pyramid.</p>
+        <div class="meta">
+            <span><b>Author</b> Jessica Nguyen</span>
+            <span><b>Course</b> CS180, UC Berkeley</span>
+            <span><b>Term</b> Fall 2026</span>
+        </div>
+        <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">NumPy</span>
+            <span class="tag">Image Pyramids</span>
+            <span class="tag">NCC / L2 Scoring</span>
+            <span class="tag">Image Registration</span>
+        </div>
     </div>
+
+    <div class="hero-img">
+        <div class="frame">
+            <div class="side"><img src="cathedral.jpg" alt="Original glass plate negative"><span>Input: three stacked B / G / R plates</span></div>
+            <div class="side after"><img src="1.png" alt="Aligned color result"><span>Output: aligned color image</span></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="num">17</div><div class="lbl">images aligned</div></div>
+        <div class="stat"><div class="num">±15 px</div><div class="lbl">search window per pyramid level</div></div>
+        <div class="stat"><div class="num">175 px</div><div class="lbl">largest displacement recovered</div></div>
+        <div class="stat"><div class="num">4–5×</div><div class="lbl">NCC cost vs. L2</div></div>
+    </div>
+
+    <main>
+        <section id="overview">
+            <div class="section-num">01</div>
+            <h2>Overview</h2>
+            <div class="prose">
+                <p>Sergei Prokudin-Gorskii, a photographer working in the early 1900s, pioneered color photography in the Russian Empire at a time when color printing technology didn't yet exist. His technique involved photographing each scene three separate times, using red, green, and blue filters respectively, and recording all three exposures on a single glass plate.</p>
+                <p>The Library of Congress now preserves these digitized negatives, which are arranged with the three color separations stacked vertically — blue at the top, green in the middle, and red at the bottom. This project implements image alignment techniques to reconstruct color images from these digitized glass plate photographs.</p>
+            </div>
+            <div class="pipeline">
+                <div class="step"><div class="n">1</div><b>Split</b><p>Divide the plate into B, G, and R channels.</p></div>
+                <div class="step"><div class="n">2</div><b>Crop</b><p>Trim 10% from each edge to remove dark borders.</p></div>
+                <div class="step"><div class="n">3</div><b>Align</b><p>Search for the (x, y) shift of G and R relative to B.</p></div>
+                <div class="step"><div class="n">4</div><b>Stack</b><p>Combine the shifted channels into one RGB image.</p></div>
+            </div>
+        </section>
+
+        <section id="single">
+            <div class="section-num">02</div>
+            <h2>Single-Scale Alignment</h2>
+            <div class="prose">
+                <p>For the single-scale alignment, I implemented an exhaustive search method that looked through a range of [-15, 15] pixels in both x and y directions for the green and red channels relative to the blue channel. The alignment was scored using the L2 norm (sum of squared differences) to find the best offsets that minimized the difference between the channels.</p>
+                <p>I chose the L2 norm because it is simple to compute and effective for images with consistent lighting and contrast, which allowed for a fast computation time. One of the challenges I faced was the edges of the images: since the edges were dark borders, the search would sometimes find offsets that aligned the borders but not the actual content of the images. To avoid this, I cropped the images by 10% on each side.</p>
+            </div>
+
+            <div class="stack" style="margin-top: 30px;">
+                <div class="card">
+                    <div class="result-title">
+                        <h3>Cathedral</h3>
+                        <div class="offsets"><span class="pill g">G (5, 2)</span><span class="pill r">R (12, 3)</span></div>
+                    </div>
+                    <div class="compare">
+                        <figure><img src="cathedral.jpg" alt="Cathedral original"><figcaption>Original (misaligned)</figcaption></figure>
+                        <figure><img src="1.png" alt="Cathedral aligned"><figcaption>Aligned result</figcaption></figure>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="result-title">
+                        <h3>Monastery</h3>
+                        <div class="offsets"><span class="pill g">G (-3, 2)</span><span class="pill r">R (3, 2)</span></div>
+                    </div>
+                    <div class="compare">
+                        <figure><img src="monastery.jpg" alt="Monastery original"><figcaption>Original (misaligned)</figcaption></figure>
+                        <figure><img src="2.png" alt="Monastery aligned"><figcaption>Aligned result</figcaption></figure>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="result-title">
+                        <h3>Tobolsk</h3>
+                        <div class="offsets"><span class="pill g">G (3, 3)</span><span class="pill r">R (6, 3)</span></div>
+                    </div>
+                    <div class="compare">
+                        <figure><img src="obolsk.jpg" alt="Tobolsk original"><figcaption>Original (misaligned)</figcaption></figure>
+                        <figure><img src="3.png" alt="Tobolsk aligned"><figcaption>Aligned result</figcaption></figure>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout">
+                <b>Analysis.</b> The single-scale method was sufficient for these small JPEGs because the offsets were small and the lighting was consistent across channels. There weren't significant lighting issues, so I used L2 instead of NCC for simplicity and speed. Because the pictures are relatively small, an exhaustive search over [-15, 15] pixels worked well.
+            </div>
+        </section>
+
+        <section id="pyramid">
+            <div class="section-num">03</div>
+            <h2>Multi-Scale Pyramid Alignment</h2>
+            <div class="prose">
+                <p>Since the TIF files are thousands of pixels wide, a brute-force exhaustive search over the full range would be computationally expensive. I implemented a multi-scale pyramid alignment approach: I recursively downscale each image by 0.5 until it reaches 300 pixels in height. At the coarsest level, I perform an exhaustive search over [-15, 15] pixels. Since the displacement scales proportionally with image size, this search range captures much larger actual displacements at coarser scales.</p>
+                <p>I then propagate the estimated offset up the pyramid, doubling it at each level and refining it locally with a [-15, 15] search. This coarse-to-fine strategy is much faster than searching the full range at full resolution.</p>
+            </div>
+
+            <h3>Scoring metric: NCC vs. L2</h3>
+            <div class="prose">
+                <p>I used a mix of NCC and L2. I originally started with L2, but for certain pictures the L2 minimization failed because L2 is not robust to brightness variations, so I switched to NCC for those images. I chose not to use NCC for every image because it is computationally expensive: if L2 took 1 minute to align a picture, NCC took 4–5 minutes, and the gap grows with image size. So I used L2 first to find all the alignments that didn't have as many brightness variations, then used NCC for the images that didn't align with L2.</p>
+            </div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="name">L2 (Euclidean distance) <span class="badge">minimize · fast</span></div>
+                    <code>L2 = sqrt(sum((im1 - im2)^2))</code>
+                    <p>Default metric. Works well when channels have similar brightness.</p>
+                </div>
+                <div class="metric">
+                    <div class="name">Normalized Cross-Correlation <span class="badge">maximize · robust</span></div>
+                    <code>NCC = sum((im1 - mean(im1)) * (im2 - mean(im2))) / (std(im1) * std(im2))</code>
+                    <p>Fallback for images with brightness differences between channels.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="results">
+            <div class="section-num">04</div>
+            <h2>Results</h2>
+            <div class="prose"><p>14 provided images aligned with the pyramid method. Click any image to enlarge.</p></div>
+            <div class="gallery">
+                <div class="tile"><img src="1.png" alt="Cathedral"><div class="info"><b>Cathedral</b><div class="offsets"><span class="pill g">G (5, 2)</span><span class="pill r">R (12, 3)</span></div></div></div>
+                <div class="tile"><img src="2.png" alt="Monastery"><div class="info"><b>Monastery</b><div class="offsets"><span class="pill g">G (-3, 2)</span><span class="pill r">R (3, 2)</span></div></div></div>
+                <div class="tile"><img src="3.png" alt="Tobolsk"><div class="info"><b>Tobolsk</b><div class="offsets"><span class="pill g">G (3, 3)</span><span class="pill r">R (6, 3)</span></div></div></div>
+                <div class="tile"><img src="4.png" alt="Church"><div class="info"><b>Church</b><div class="offsets"><span class="pill g">G (3, 24)</span><span class="pill r">R (-4, 58)</span></div></div></div>
+                <div class="tile"><img src="5.png" alt="Icon"><div class="info"><b>Icon</b><div class="offsets"><span class="pill g">G (18, 41)</span><span class="pill r">R (23, 89)</span></div></div></div>
+                <div class="tile"><img src="6.png" alt="Emir"><div class="info"><b>Emir</b><div class="offsets"><span class="pill g">G (18, 41)</span><span class="pill r">R (23, 89)</span></div><div class="note">Aligned with a bounded exhaustive search</div></div></div>
+                <div class="tile"><img src="7.png" alt="Harvesters"><div class="info"><b>Harvesters</b><div class="offsets"><span class="pill g">G (18, 59)</span><span class="pill r">R (15, 124)</span></div></div></div>
+                <div class="tile"><img src="8.png" alt="Ilemselga"><div class="info"><b>Ilemselga</b><div class="offsets"><span class="pill g">G (7, 41)</span><span class="pill r">R (11, 131)</span></div></div></div>
+                <div class="tile"><img src="9.png" alt="Self portrait"><div class="info"><b>Self Portrait</b><div class="offsets"><span class="pill g">G (29, 77)</span><span class="pill r">R (36, 175)</span></div></div></div>
+                <div class="tile"><img src="10.png" alt="Religious painting"><div class="info"><b>Religious Painting</b><div class="offsets"><span class="pill g">G (4, 27)</span><span class="pill r">R (7, 69)</span></div></div></div>
+                <div class="tile"><img src="11.png" alt="Siren"><div class="info"><b>Siren</b><div class="offsets"><span class="pill g">G (-4, 49)</span><span class="pill r">R (-23, 96)</span></div></div></div>
+                <div class="tile"><img src="12.png" alt="Generations"><div class="info"><b>Generations</b><div class="offsets"><span class="pill g">G (17, 50)</span><span class="pill r">R (13, 105)</span></div><div class="note">Aligned with NCC</div></div></div>
+                <div class="tile"><img src="13.png" alt="Wharf"><div class="info"><b>Wharf</b><div class="offsets"><span class="pill g">G (17, 50)</span><span class="pill r">R (13, 105)</span></div></div></div>
+                <div class="tile"><img src="14.png" alt="Melons"><div class="info"><b>Melons</b><div class="offsets"><span class="pill g">G (17, 50)</span><span class="pill r">R (13, 105)</span></div><div class="note">Aligned with NCC</div></div></div>
+            </div>
+
+            <div class="callout">
+                <b>Hardest cases.</b> I was able to align all the images without any serious defects. The hardest to align were Melons and Generations: L2 alone couldn't align them, so I switched to NCC for scoring. Emir was also difficult because his bright blue robes confused the pyramid, so for that image I used an exhaustive search over a bounded pixel range. For most of the other pictures, that approach would have required far too much computation.
+            </div>
+        </section>
+
+        <section id="custom">
+            <div class="section-num">05</div>
+            <h2>Custom Images</h2>
+            <div class="prose"><p>Three additional plates I chose from the Prokudin-Gorskii collection at the Library of Congress.</p></div>
+            <div class="gallery">
+                <div class="tile"><img src="15.png" alt="Custom image 1"><div class="info"><b>Prokudin-Gorskiĭ</b><div class="offsets"><span class="pill g">G (-11, 33)</span><span class="pill r">R (-27, 139)</span></div></div></div>
+                <div class="tile"><img src="16.png" alt="Custom image 2"><div class="info"><b>Brick building with arched arcade</b><div class="offsets"><span class="pill g">G (-11, 42)</span><span class="pill r">R (-26, 98)</span></div></div></div>
+                <div class="tile"><img src="17.png" alt="Custom image 3"><div class="info"><b>Sacks in a storage room</b><div class="offsets"><span class="pill g">G (22, 52)</span><span class="pill r">R (13, 123)</span></div></div></div>
+            </div>
+        </section>
+
+        <section id="lessons">
+            <div class="section-num">06</div>
+            <h2>Key Insights &amp; Lessons</h2>
+            <div class="prose">
+                <p>It was fascinating to learn about the history of color photography and realize that photographers like Prokudin-Gorskii manually performed the alignment calculations we now automate. Understanding the mathematical complexity behind what we take for granted today was eye-opening.</p>
+            </div>
+            <div class="takeaways">
+                <div class="takeaway"><b>Pyramids make big searches cheap</b><p>A 100-pixel displacement at full resolution becomes 50 pixels at 0.5 scale, 25 at 0.25, and so on — so a small ±15 px window at each level still captures large displacements.</p></div>
+                <div class="takeaway"><b>No single metric fits every image</b><p>L2 worked well for most images but failed badly on those with significant brightness differences between channels, like melons.tif.</p></div>
+                <div class="takeaway"><b>Robustness has a cost</b><p>NCC solved the brightness problem but was 4–5× slower, so I used it only where L2 failed.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <a href="index.html">← All projects</a>
+        <a href="project2.html">Project 2: Filters &amp; Frequencies →</a>
+        <p style="margin-top: 12px;">Jessica Nguyen · CS180 Fall 2026</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox"><img alt=""></div>
+    <script>
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('img');
+        document.querySelectorAll('.tile img, .compare img, .hero-img img').forEach(img => {
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', () => { lbImg.src = img.src; lbImg.alt = img.alt; lb.classList.add('open'); });
+        });
+        lb.addEventListener('click', () => lb.classList.remove('open'));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+    </script>
 </body>
 </html>
