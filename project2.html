@@ -17,7 +17,7 @@
             background-color: #f5f5f5;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -69,65 +69,33 @@
         }
         h3 {
             color: #764ba2;
-            margin-top: 20px;
-            margin-bottom: 15px;
+            margin-top: 30px;
+            margin-bottom: 12px;
         }
-        .todo {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
+        p {
+            margin-bottom: 12px;
         }
-        .todo h4 {
-            color: #ff6b6b;
-            margin-bottom: 10px;
-            font-size: 1.1em;
+        figure {
+            margin: 20px 0;
+            text-align: center;
         }
-        .todo ul {
-            margin-left: 20px;
-        }
-        .todo li {
-            margin: 8px 0;
-            color: #555;
-        }
-        .checklist {
-            margin-left: 20px;
-        }
-        .checklist li {
-            margin: 10px 0;
-        }
-        pre {
-            background: #f4f4f4;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: 'Courier New', monospace;
-            color: #d63384;
-            font-size: 0.95em;
-        }
-        pre code {
-            color: #333;
-        }
-        .section-box {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin: 15px 0;
+        figure img {
+            max-width: 100%;
+            height: auto;
             border-radius: 5px;
+            border: 1px solid #ddd;
         }
-        .points {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-left: 10px;
+        figcaption {
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 6px;
+        }
+        .note {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            border-radius: 4px;
+            color: #7a5b00;
         }
         footer {
             text-align: center;
@@ -142,389 +110,119 @@
     <div class="container">
         <div class="nav">
             <a href="index.html">← Back to CS180</a>
+            <a href="project1.html">← Project 1</a>
         </div>
 
         <header>
             <h1>Project 2: Fun with Filters and Frequencies!</h1>
-            <p>Image Processing with Convolutions and Frequency Analysis</p>
+            <p>CS180 Project 2 - Fall 2026</p>
+            <p>By: Jessica Nguyen</p>
         </header>
 
-        <!-- PART 1: FILTERS AND EDGES -->
         <section>
-            <h2>Part 1: Fun with Filters <span class="points">30 pts</span></h2>
-            <p>Build intuitions about 2D convolutions and filtering using finite difference operators.</p>
+            <h2>Part 1: Filters and Edges</h2>
 
-            <!-- Part 1.1 -->
-            <div class="section-box">
-                <h3>Part 1.1: Convolutions from Scratch! <span class="points">10 pts</span></h3>
+            <h3>Part 1.1: Convolutions from Scratch!</h3>
+            <p class="note">✏️ Explain your 4-loop and 2-loop convolutions, compare them with scipy.signal.convolve2d, comment on runtime, and describe how boundaries are handled (zero padding).</p>
+            <figure>
+                <img src="proj2/part_1_1_results.png" alt="Part 1.1 results">
+                <figcaption>My photo in grayscale, convolved with a 9×9 box filter, Dx = [1, −1], and Dy = [1, −1]ᵀ.</figcaption>
+            </figure>
 
-                <h4>Overview</h4>
-                <p>Convolution is a fundamental operation in image processing. It works by sliding a kernel (filter) across an image and computing weighted sums at each position. In 2D convolution, the kernel is flipped both horizontally and vertically before the operation, distinguishing it from cross-correlation.</p>
+            <h3>Part 1.2: Finite Difference Operator</h3>
+            <p class="note">✏️ Describe the partial derivatives and gradient magnitude, and justify your threshold choice (0.25).</p>
+            <figure>
+                <img src="proj2/part_1_2_results.png" alt="Part 1.2 results">
+                <figcaption>Partial derivatives, gradient magnitude, and binarized edges.</figcaption>
+            </figure>
 
-                <h4>Implementation 1: Four-Loop Convolution (Naive)</h4>
-                <p>The straightforward approach with four nested for loops:</p>
-                
-    # Pad image
-    padded_image = np.pad("CS180Website1\pt2.1.png", pad_width=pad, mode='constant', constant_values=pad_value)
-    output = np.zeros((output_H, output_W))
-
-    # Four nested loops: output row, output col, kernel row, kernel col
-    for i in range(output_H):
-        for j in range(output_W):
-            for ki in range(K):
-                for kj in range(K):
-                    output[i, j] += padded_image[i+ki, j+kj] * kernel_flipped[ki, kj]
-
-    return output</code></pre>
-                <p><strong>Time Complexity:</strong> O(H × W × K²) - slow for large kernels</p>
-
-                <h4>Implementation 2: Two-Loop Convolution (Vectorized)</h4>
-                <p>Optimized version using NumPy vectorization to avoid the inner kernel loops:</p>
-                <pre><code>def convolve2d_2loops(image, kernel, padding_mode='same', pad_value=0):
-    """Convolution with 2 loops and NumPy vectorization."""
-    H, W = image.shape
-    K = kernel.shape[0]
-
-    kernel_flipped = np.flip(np.flip(kernel, axis=0), axis=1)
-
-    if padding_mode == 'same':
-        pad = K // 2
-        output_H, output_W = H, W
-    else:  # 'full'
-        pad = K - 1
-        output_H, output_W = H + 2*pad, W + 2*pad
-
-    padded_image = np.pad(image, pad_width=pad, mode='constant', constant_values=pad_value)
-    output = np.zeros((output_H, output_W))
-
-    # Two loops: extract patches and compute dot products with vectorization
-    for i in range(output_H):
-        for j in range(output_W):
-            patch = padded_image[i:i+K, j:j+K]
-            output[i, j] = np.sum(patch * kernel_flipped)  # Vectorized multiplication
-
-    return output</code></pre>
-                <p><strong>Time Complexity:</strong> O(H × W × K²) - but much faster in practice due to NumPy optimization</p>
-
-                <h4>Filter Definitions</h4>
-                <p>We use three key filters:</p>
-                <pre><code># 9×9 Box Filter (for blurring)
-box_filter = np.ones((9, 9)) / 81
-
-# Dx Filter (vertical edges / x-derivative)
-Dx = np.array([[-1, 0, 1],
-               [-2, 0, 2],
-               [-1, 0, 1]])
-
-# Dy Filter (horizontal edges / y-derivative)
-Dy = np.array([[-1, -2, -1],
-               [ 0,  0,  0],
-               [ 1,  2,  1]])</code></pre>
-
-                <h4>Results on Self-Portrait (me.png)</h4>
-                <p>Applying the convolution implementations to a grayscale self-portrait image:</p>
-                <ul style="margin-left: 20px;">
-                    <li><strong>Original:</strong> Grayscale self-portrait image</li>
-                    <li><strong>Box Filter (9×9):</strong> Blurred version - smooths out details</li>
-                    <li><strong>Dx Filter:</strong> Vertical edges - detects vertical gradients</li>
-                    <li><strong>Dy Filter:</strong> Horizontal edges - detects horizontal gradients</li>
-                    <li><strong>Edge Magnitude:</strong> √(Dx² + Dy²) - combined gradient strength</li>
-                    <li><strong>Binarized Edges:</strong> Thresholded edge map for binary output</li>
-                </ul>
-                <p><em>Results displayed in: part_1_1_convolution_results.png</em></p>
-
-                <h4>Comparison with scipy.signal.convolve2d</h4>
-                <p>We validate our implementations against scipy:</p>
-                <ul style="margin-left: 20px;">
-                    <li><strong>4-loop vs 2-loop:</strong> Results match exactly (within numerical precision)</li>
-                    <li><strong>Both vs scipy:</strong> Results match - same algorithm, different implementation</li>
-                    <li><strong>Speed comparison:</strong> 2-loop is ~50-100× faster than 4-loop on typical images</li>
-                </ul>
-
-                <h4>Key Insights</h4>
-                <ul style="margin-left: 20px;">
-                    <li><strong>Kernel Flipping:</strong> Essential for convolution - distinguishes it from correlation</li>
-                    <li><strong>Padding:</strong> "Same" padding preserves image dimensions; "full" padding includes all partial overlaps</li>
-                    <li><strong>Vectorization:</strong> NumPy's element-wise operations are vastly faster than Python loops</li>
-                    <li><strong>Edge Detection:</strong> Finite difference filters (Dx, Dy) effectively capture image gradients</li>
-                </ul>
-            </div>
-
-            <!-- Part 1.2 -->
-            <div class="section-box">
-                <h3>Part 1.2: Finite Difference Operator <span class="points">10 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Edge Detection on Cameraman Image</h4>
-                    <ul>
-                        <li>[ ] Load the cameraman image</li>
-                        <li>[ ] Apply Dx filter and show partial derivative in x</li>
-                        <li>[ ] Apply Dy filter and show partial derivative in y</li>
-                        <li>[ ] Compute gradient magnitude image</li>
-                        <li>[ ] Display results</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Binarize Edge Image</h4>
-                    <ul>
-                        <li>[ ] Choose appropriate threshold to suppress noise while showing real edges</li>
-                        <li>[ ] Binarize gradient magnitude image</li>
-                        <li>[ ] Document threshold choice and justify reasoning</li>
-                        <li>[ ] Show results on website</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Part 1.3 -->
-            <div class="section-box">
-                <h3>Part 1.3: Derivative of Gaussian (DoG) Filter <span class="points">10 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Create Gaussian Filter & DoG</h4>
-                    <ul>
-                        <li>[ ] Use cv2.getGaussianKernel() to create 1D Gaussian</li>
-                        <li>[ ] Create 2D Gaussian kernel via outer product</li>
-                        <li>[ ] Visualize and display the Gaussian kernel</li>
-                        <li>[ ] Create Dx and Dy derivative of Gaussian filters</li>
-                        <li>[ ] Visualize and display DoG filters</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Apply & Compare</h4>
-                    <ul>
-                        <li>[ ] Apply Gaussian smoothing to cameraman image</li>
-                        <li>[ ] Compute gradient magnitude on smoothed image</li>
-                        <li>[ ] Apply DoG filters directly to original image</li>
-                        <li>[ ] Compare results with finite difference method</li>
-                        <li>[ ] Document what differences you see</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Bells & Whistles (OPTIONAL - Extra Credit)</h4>
-                    <ul>
-                        <li>[ ] Compute gradient orientations (without built-in angle functions)</li>
-                        <li>[ ] Visualize orientations using HSV color space</li>
-                        <li>[ ] Use cyclic colormap from matplotlib</li>
-                        <li>[ ] Explain your process on website</li>
-                    </ul>
-                </div>
-            </div>
+            <h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
+            <p class="note">✏️ Explain how you built the Gaussian and DoG filters, and compare these results with the finite difference results from 1.2.</p>
+            <figure>
+                <img src="proj2/part_1_3_filters.png" alt="Gaussian and DoG filters">
+                <figcaption>The Gaussian filter and the two DoG filters.</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_1_3_blur_then_derivative.png" alt="Blur then derivative">
+                <figcaption>Blurring first, then taking derivatives (threshold 0.08).</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_1_3_comparison.png" alt="Edge comparison">
+                <figcaption>Finite difference vs. blur-then-derivative vs. DoG.</figcaption>
+            </figure>
         </section>
 
-        <!-- PART 2: APPLICATIONS -->
         <section>
-            <h2>Part 2: Fun with Frequencies <span class="points">65 pts</span></h2>
-            <p>Apply convolution techniques to create interesting image effects.</p>
+            <h2>Part 2: Applications</h2>
 
-            <!-- Part 2.1 -->
-            <div class="section-box">
-                <h3>Part 2.1: Image Sharpening <span class="points">15 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Implement Unsharp Masking</h4>
-                    <ul>
-                        <li>[ ] Create low-pass (Gaussian blur) filter</li>
-                        <li>[ ] Create high-pass filter (impulse - Gaussian)</li>
-                        <li>[ ] Implement unsharp masking: sharp = original + α×(original - blurred)</li>
-                        <li>[ ] Combine into single convolution operation</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Test on Taj Mahal & Another Image</h4>
-                    <ul>
-                        <li>[ ] Download Taj Mahal image from provided link</li>
-                        <li>[ ] Show original, blurred, high-frequency, and sharpened versions</li>
-                        <li>[ ] Vary sharpening amount (α) and show different results</li>
-                        <li>[ ] Explain how unsharp masking relates to blur and high frequencies</li>
-                        <li>[ ] Pick another image and repeat process</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Evaluation Test</h4>
-                    <ul>
-                        <li>[ ] Pick a sharp image</li>
-                        <li>[ ] Blur it</li>
-                        <li>[ ] Try to sharpen it back</li>
-                        <li>[ ] Compare original vs. sharpened blurred image</li>
-                        <li>[ ] Report observations (can you recover original quality?)</li>
-                    </ul>
-                </div>
-            </div>
+            <h3>Part 2.1: Image "Sharpening"</h3>
+            <p class="note">✏️ Explain how the unsharp mask works in relation to blurring and high frequencies, and how changing α changes the result.</p>
+            <figure>
+                <img src="proj2/part_2_1_taj.png" alt="Taj Mahal sharpening">
+                <figcaption>Taj Mahal: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_1_taj_amounts.png" alt="Taj Mahal sharpening amounts">
+                <figcaption>Increasing α makes edges crisper, but large values exaggerate noise and create halos.</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_1_dog.png" alt="Dog sharpening">
+                <figcaption>My own image: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_1_dog_amounts.png" alt="Dog sharpening amounts">
+                <figcaption>Different sharpening amounts on my own image.</figcaption>
+            </figure>
 
-            <!-- Part 2.2 -->
-            <div class="section-box">
-                <h3>Part 2.2: Hybrid Images <span class="points">20 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Create Three Hybrid Images</h4>
-                    <ul>
-                        <li>[ ] Hybrid 1: Derek + Nutmeg (sample images - with full process)</li>
-                        <li>[ ] Hybrid 2: Your custom pair (show originals + final only)</li>
-                        <li>[ ] Hybrid 3: Your custom pair (show originals + final only)</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Full Process for Favorite Result (Derek + Nutmeg or one custom)</h4>
-                    <ul>
-                        <li>[ ] Show original images</li>
-                        <li>[ ] Show alignment process (if needed)</li>
-                        <li>[ ] Extract low frequencies from image 1</li>
-                        <li>[ ] Extract high frequencies from image 2</li>
-                        <li>[ ] Show 2D Fourier transforms of inputs</li>
-                        <li>[ ] Show Fourier transforms of filtered results</li>
-                        <li>[ ] Document cutoff frequency choices</li>
-                        <li>[ ] Show final hybrid image</li>
-                        <li>[ ] Show Fourier transform of hybrid</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Image Selection Tips</h4>
-                    <ul>
-                        <li>[ ] Consider: change of expression, morph between objects, change over time</li>
-                        <li>[ ] Pick images that align well</li>
-                        <li>[ ] Experiment with cutoff frequency values</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Bells & Whistles (OPTIONAL - Extra Credit)</h4>
-                    <ul>
-                        <li>[ ] Try using color to enhance the effect</li>
-                        <li>[ ] Explore: color in high-frequency, low-frequency, or both?</li>
-                        <li>[ ] Document and justify your choices</li>
-                    </ul>
-                </div>
-            </div>
+            <h3>Part 2.2: Hybrid Images</h3>
+            <p class="note">✏️ Explain your alignment, filtering, and cutoff frequency (σ) choices.</p>
+            <figure>
+                <img src="proj2/part_2_2_DerekPicture_nutmeg_process.png" alt="Derek and Nutmeg hybrid process">
+                <figcaption>Derek + Nutmeg: aligned inputs, filtered results, and final hybrid.</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_2_DerekPicture_nutmeg_fft.png" alt="Derek and Nutmeg Fourier transforms">
+                <figcaption>Log magnitude of the Fourier transforms of the inputs, filtered images, and hybrid.</figcaption>
+            </figure>
 
-            <!-- Part 2.3 -->
-            <div class="section-box">
-                <h3>Part 2.3: Gaussian and Laplacian Stacks <span class="points">10 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Implement Stacks from Scratch</h4>
-                    <ul>
-                        <li>[ ] Create Gaussian stack (no downsampling)</li>
-                        <li>[ ] Create Laplacian stack (differences between Gaussian levels)</li>
-                        <li>[ ] DO NOT use built-in pyramid functions (cv2.pyrDown, pyramid_gaussian, etc.)</li>
-                        <li>[ ] Verify stacks are correct</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Apply to Orange + Apple</h4>
-                    <ul>
-                        <li>[ ] Download Orange + Apple sample images</li>
-                        <li>[ ] Build Gaussian stacks</li>
-                        <li>[ ] Build Laplacian stacks</li>
-                        <li>[ ] Visualize all levels of stacks</li>
-                        <li>[ ] Display like Figure 3.42 in Szelski (page 167)</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Documentation</h4>
-                    <ul>
-                        <li>[ ] Explain difference between stacks and pyramids</li>
-                        <li>[ ] Show all visualizations on website</li>
-                    </ul>
-                </div>
-            </div>
+            <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
+            <p class="note">✏️ Explain how your Gaussian and Laplacian stacks are built and how stacks differ from pyramids.</p>
+            <figure>
+                <img src="proj2/part_2_3_apple_stacks.png" alt="Apple stacks">
+                <figcaption>Apple: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_3_orange_stacks.png" alt="Orange stacks">
+                <figcaption>Orange: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
+            </figure>
 
-            <!-- Part 2.4 -->
-            <div class="section-box">
-                <h3>Part 2.4: Multiresolution Blending <span class="points">20 pts</span></h3>
-                <div class="todo">
-                    <h4>TODO: Implement Multiresolution Blending</h4>
-                    <ul>
-                        <li>[ ] Create Gaussian stacks for both input images</li>
-                        <li>[ ] Create Laplacian stacks for both input images</li>
-                        <li>[ ] Create Gaussian stack for blend mask</li>
-                        <li>[ ] Blend Laplacian stacks at each level using mask</li>
-                        <li>[ ] Reconstruct blended image from blended Laplacian stack</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Vertical/Horizontal Seam ("Oraple")</h4>
-                    <ul>
-                        <li>[ ] Create vertical seam mask (step function)</li>
-                        <li>[ ] OR create horizontal seam mask (step function)</li>
-                        <li>[ ] Blend Orange + Apple images with seam</li>
-                        <li>[ ] Show results (smooth seam, no obvious edge)</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Irregular Mask Blending</h4>
-                    <ul>
-                        <li>[ ] Create 2+ pairs with irregular masks (not just lines)</li>
-                        <li>[ ] Masks could be: circular, curved, freeform shapes, etc.</li>
-                        <li>[ ] Show blended results</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Creative Blending</h4>
-                    <ul>
-                        <li>[ ] Blend your own creative image pairs</li>
-                        <li>[ ] Document your choices and results</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Detailed Visualization (for favorite result)</h4>
-                    <ul>
-                        <li>[ ] Show input images with blend mask</li>
-                        <li>[ ] Show Laplacian stack levels for each input</li>
-                        <li>[ ] Show blended Laplacian stack</li>
-                        <li>[ ] Show final blended result</li>
-                        <li>[ ] Similar to Figure 10 in Burt & Adelson paper</li>
-                    </ul>
-                </div>
-                <div class="todo">
-                    <h4>TODO: Bells & Whistles (OPTIONAL - Extra Credit)</h4>
-                    <ul>
-                        <li>[ ] Try blending with color images</li>
-                        <li>[ ] Document results and justify approach</li>
-                    </ul>
-                </div>
-            </div>
+            <h3>Part 2.4: Multiresolution Blending</h3>
+            <p class="note">✏️ Explain how multiresolution blending works and describe your mask choices.</p>
+            <figure>
+                <img src="proj2/part_2_4_oraple_result.png" alt="Oraple">
+                <figcaption>The oraple, blended with a vertical step mask.</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_4_oraple_process.png" alt="Oraple process">
+                <figcaption>Recreating Figure 3.42: masked apple, masked orange, and blended Laplacian levels 0, 2, and 4 (a–i), and the collapsed results (j–l).</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_4_dog_cat_vertical_result.png" alt="Dog and cat vertical blend">
+                <figcaption>My own images blended with a vertical seam.</figcaption>
+            </figure>
+            <figure>
+                <img src="proj2/part_2_4_cat_dog_circle_result.png" alt="Cat and dog circle blend">
+                <figcaption>My own images blended with an irregular (circular) mask.</figcaption>
+            </figure>
         </section>
 
-        <!-- OVERALL REQUIREMENTS -->
         <section>
-            <h2>Overall Deliverables</h2>
-            <div class="todo">
-                <h4>TODO: Website & Writeup</h4>
-                <ul>
-                    <li>[ ] Create complete HTML/CSS website with all results</li>
-                    <li>[ ] Include all code snippets (especially Part 1.1)</li>
-                    <li>[ ] Include all images and visualizations</li>
-                    <li>[ ] Write clear explanations for each section</li>
-                    <li>[ ] Answer all questions posed in assignment</li>
-                    <li>[ ] Clarity & organization (5 points)</li>
-                </ul>
-            </div>
-            <div class="todo">
-                <h4>TODO: Reflections</h4>
-                <ul>
-                    <li>[ ] Write about the most important thing you learned from this project</li>
-                </ul>
-            </div>
-            <div class="todo">
-                <h4>TODO: Submission</h4>
-                <ul>
-                    <li>[ ] Submit website URL to class gallery via Google Form</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- SCORING SUMMARY -->
-        <section>
-            <h2>Scoring Summary (CS180)</h2>
-            <ul class="checklist">
-                <li><strong>Part 1.1:</strong> 10 points - Convolution implementations</li>
-                <li><strong>Part 1.2:</strong> 10 points - Finite difference edge detection</li>
-                <li><strong>Part 1.3:</strong> 10 points - Gaussian & DoG filters</li>
-                <li><strong>Part 2.1:</strong> 15 points - Image sharpening</li>
-                <li><strong>Part 2.2:</strong> 20 points - Hybrid images</li>
-                <li><strong>Part 2.3:</strong> 10 points - Gaussian/Laplacian stacks</li>
-                <li><strong>Part 2.4:</strong> 20 points - Multiresolution blending</li>
-                <li><strong>Clarity:</strong> 5 points - Website quality & explanations</li>
-            </ul>
-            <p style="margin-top: 20px; font-weight: bold;">Total: 100 points</p>
+            <h2>What I Learned</h2>
+            <p class="note">✏️ Write the most important thing you learned from this project.</p>
         </section>
 
         <footer>
-            <p>CS180 Project 2 - Spring 2026</p>
+            <p>&copy; 2026 CS180 - Computer Vision Course</p>
         </footer>
     </div>
 </body>
