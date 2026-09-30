@@ -138,7 +138,13 @@
             </figure>
 
             <h3>Part 1.2: Finite Difference Operator</h3>
-            <p class="note">✏️ Describe the partial derivatives and gradient magnitude, and justify your threshold choice (0.25).</p>
+            <p class="note">The partial derivatives Dx and Dy measure how fast the image intensity changes in the x and y directions.
+                While on the other hand, the gradient magnitude combines these two derivatives to give a single measure of how fast 
+                the intensity changes in any direction. This gives a single number at each pixel that tells how strong the edge is, 
+                regardless of direction. High magnitude means a sharp change in intensity; low magnitude means a flat region. I thresholded 
+                the gradient magnitude at 0.25 to get a binary edge image. At lower thresholds, the grass texture creates a lot of noise—many 
+                small speckles from fine detail. At higher thresholds, the edges of the cameraman and tripod start breaking up and disappearing.
+            </p>
             <figure>
                 <img src="proj2/part_1_2_results.png" alt="Part 1.2 results">
                 <figcaption>Partial derivatives, gradient magnitude, and binarized edges.</figcaption>
