@@ -3,137 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 - Computer Vision</title>
+    <title>Jessica Nguyen | Computer Vision Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #07091a;
+            --surface: rgba(255,255,255,0.045);
+            --surface-solid: #0f1330;
+            --text: #eef0ff;
+            --muted: #9aa1c7;
+            --border: rgba(255,255,255,0.09);
+            --accent: #8b93ff;
+            --accent-soft: rgba(139,147,255,0.14);
+            --green: #34e39a;
+            --red: #ff5c7a;
+            --blue: #4da3ff;
+            --grad: linear-gradient(90deg, #ff5c7a, #b388ff 40%, #4da3ff 70%, #34e39a);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            position: relative;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background:
+                radial-gradient(600px 400px at 10% 20%, rgba(255,92,122,0.10), transparent 70%),
+                radial-gradient(700px 500px at 90% 40%, rgba(77,163,255,0.10), transparent 70%),
+                radial-gradient(600px 500px at 40% 100%, rgba(52,227,154,0.07), transparent 70%);
         }
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 50px;
-            animation: slideDown 0.6s ease-out;
+        .glow-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        a { color: var(--accent); text-decoration: none; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: rgba(7,9,26,0.7); backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
         }
-        header h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .topbar-inner {
+            max-width: 1120px; margin: 0 auto; padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        header p {
-            font-size: 1.2em;
-            opacity: 0.95;
+        .brand { font-weight: 700; color: var(--text); }
+        .links { display: flex; gap: 24px; font-size: 14px; }
+        .links a { color: var(--muted); font-weight: 500; }
+        .links a:hover { color: var(--accent); }
+
+        .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+        #field { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .aurora { position: absolute; inset: -20%; pointer-events: none; filter: blur(80px); opacity: 0.42; }
+        .aurora span { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+        .aurora .a1 { width: 520px; height: 520px; background: #ff3b6b; left: 5%; top: 10%; animation: drift1 16s ease-in-out infinite alternate; }
+        .aurora .a2 { width: 600px; height: 600px; background: #2f6bff; right: 0%; top: 0%; animation: drift2 19s ease-in-out infinite alternate; }
+        .aurora .a3 { width: 460px; height: 460px; background: #18d98b; left: 40%; bottom: 0%; animation: drift3 22s ease-in-out infinite alternate; }
+        @keyframes drift1 { to { transform: translate(180px, 90px) scale(1.15); } }
+        @keyframes drift2 { to { transform: translate(-200px, 120px) scale(0.9); } }
+        @keyframes drift3 { to { transform: translate(-160px, -100px) scale(1.2); } }
+        .hero-inner { position: relative; max-width: 1120px; margin: 0 auto; padding: 110px 24px 100px; }
+        .eyebrow {
+            display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 26px;
         }
-        .projects {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
+        .rgb-title {
+            position: relative; display: inline-block;
+            font-size: clamp(2.8rem, 7vw, 5rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
         }
-        .project-card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeIn 0.6s ease-out;
-        }
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-        .project-card h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.8em;
-        }
-        .project-card p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
+        .rgb-title .layer { position: absolute; left: 0; top: 0; mix-blend-mode: screen; }
+        .rgb-title .base { color: #fff; position: relative; opacity: 0; animation: showBase 0.5s 1.9s forwards; text-shadow: 0 0 40px rgba(139,147,255,0.35); }
+        .rgb-title .r { color: #ff0000; animation: alignR 1.8s cubic-bezier(.2,.8,.2,1) forwards, fade 0.5s 1.9s forwards; }
+        .rgb-title .g { color: #00ff00; animation: alignG 1.8s cubic-bezier(.2,.8,.2,1) forwards, fade 0.5s 1.9s forwards; }
+        .rgb-title .b { color: #0000ff; animation: fade 0.5s 1.9s forwards; }
+        @keyframes alignR { from { transform: translate(18px, 14px); } to { transform: translate(0, 0); } }
+        @keyframes alignG { from { transform: translate(-14px, -10px); } to { transform: translate(0, 0); } }
+        @keyframes fade { to { opacity: 0; } }
+        @keyframes showBase { to { opacity: 1; } }
+        .hero .sub { font-size: 1.25rem; color: #d4d7f2; max-width: 640px; margin-top: 22px; }
+        .hero .hint { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 14px; opacity: 0; animation: showBase 0.6s 2.2s forwards; }
+        .cta { display: flex; gap: 12px; margin-top: 34px; flex-wrap: wrap; }
         .btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            text-decoration: none;
+            display: inline-block; padding: 12px 22px; border-radius: 10px; font-weight: 600; font-size: 15px;
             transition: transform 0.2s, box-shadow 0.2s;
-            font-weight: 600;
         }
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .btn.primary { background: linear-gradient(135deg, #ff5c7a, #8b5cff 50%, #4da3ff); color: #fff; box-shadow: 0 8px 30px rgba(139,92,255,0.35); }
+        .btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(139,92,255,0.45); }
+
+        main { max-width: 1120px; margin: 0 auto; padding: 0 24px 90px; }
+        section { padding-top: 90px; }
+        .section-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+        h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin: 6px 0 10px; }
+        .section-lede { color: var(--muted); max-width: 680px; margin-bottom: 30px; }
+
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: -40px; position: relative; }
+        .stat { background: rgba(15,19,48,0.75); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+        .stat .num { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .stat .lbl { font-size: 14px; color: var(--muted); }
+
+        .projects { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .project {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+            box-shadow: var(--shadow); display: flex; flex-direction: column;
+            transition: transform 0.25s, box-shadow 0.25s; color: inherit;
         }
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .project { position: relative; }
+        .project::after {
+            content: ''; position: absolute; inset: 0; border-radius: 18px; padding: 1px; pointer-events: none;
+            background: var(--grad); opacity: 0; transition: opacity 0.3s;
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
         }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .project:hover::after { opacity: 1; }
+        .project:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(139,92,255,0.25); }
+        .project .thumb { height: 260px; overflow: hidden; background: #0b0e24; }
+        .project .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+        .project:hover .thumb img { transform: scale(1.05); }
+        .project .body { padding: 26px; display: flex; flex-direction: column; flex: 1; }
+        .project .num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+        .project h3 { font-size: 1.4rem; font-weight: 700; margin: 4px 0 10px; letter-spacing: -0.01em; }
+        .project p { color: var(--muted); font-size: 15px; }
+        .tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 16px 0 20px; }
+        .tag { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); }
+        h2 { background: linear-gradient(90deg, #fff, #c9ccff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .project .go { margin-top: auto; font-weight: 600; color: var(--accent); }
+        .project .go span { display: inline-block; transition: transform 0.2s; }
+        .project:hover .go span { transform: translateX(4px); }
+
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+        .bar { box-shadow: 0 0 12px currentColor; }
+        .bar.g { color: rgba(52,227,154,0.5); }
+        .bar.r { color: rgba(255,92,122,0.5); }
+        .legend { display: flex; gap: 18px; font-size: 13px; color: var(--muted); margin-bottom: 18px; flex-wrap: wrap; }
+        .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
+        .bars { display: grid; gap: 10px; }
+        .bar-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 14px; font-size: 14px; }
+        .bar-row .name { color: var(--text); font-weight: 500; text-align: right; }
+        .bar-track { position: relative; height: 22px; }
+        .bar {
+            position: absolute; left: 0; height: 10px; border-radius: 5px; width: 0;
+            transition: width 1.2s cubic-bezier(.2,.8,.2,1);
         }
-        footer {
-            text-align: center;
-            color: white;
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
+        .bar.g { top: 0; background: var(--green); }
+        .bar.r { top: 12px; background: var(--red); }
+        .bar-val { position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); top: 3px; opacity: 0; transition: opacity 0.4s 1s; }
+        .bars.visible .bar-val { opacity: 1; }
+        .chart-note { font-size: 13px; color: var(--muted); margin-top: 18px; }
+
+        .demo-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; align-items: stretch; }
+        #freq { width: 100%; height: 320px; display: block; }
+        .controls label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .controls .value { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+        input[type=range] { width: 100%; accent-color: var(--accent); margin-bottom: 22px; }
+        .controls p { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+        .toggle { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+        .toggle button {
+            font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 8px;
+            border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer;
+        }
+        .toggle button.on { background: var(--accent-soft); color: #fff; border-color: var(--accent); }
+
+        .skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .skill { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; transition: border-color 0.3s, transform 0.3s; }
+        .skill:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .skill .icon {
+            width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent);
+            display: grid; place-items: center; margin-bottom: 12px;
+        }
+        .skill b { display: block; margin-bottom: 4px; }
+        .skill p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+        footer { border-top: 1px solid var(--border); padding: 34px 24px; text-align: center; color: var(--muted); font-size: 14px; }
+        footer a { font-weight: 500; margin: 0 10px; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 860px) {
+            .projects, .demo-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .skills { grid-template-columns: 1fr 1fr; }
+            .links { display: none; }
+        }
+        @media (max-width: 560px) {
+            main, .hero-inner, .topbar-inner { padding-left: 16px; padding-right: 16px; }
+            .hero-inner { padding-top: 70px; padding-bottom: 80px; }
+            .skills { grid-template-columns: 1fr; }
+            .bar-row { grid-template-columns: 96px 1fr; font-size: 12px; }
+            .panel { padding: 18px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .rgb-title .r, .rgb-title .g { animation: fade 0s forwards; }
+            .rgb-title .b { animation: fade 0s forwards; }
+            .rgb-title .base, .hero .hint { animation: showBase 0s forwards; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .bar { transition: none; }
+            .aurora span { animation: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>CS180: Computer Vision</h1>
-            <p>Image Processing & Filtering - Spring 2026</p>
-        </header>
-
-        <div class="projects">
-            <div class="project-card">
-                <h2>Project 1</h2>
-                <p>Image Warmth & Colorfulness</p>
-                <p>Explore fundamental concepts in image processing including color spaces, image manipulation, and automatic white balancing.</p>
-                <a href="project1.html" class="btn">View Project 1</a>
-            </div>
-
-            <div class="project-card">
-                <h2>Project 2</h2>
-                <p>Fun with Filters and Frequencies</p>
-                <p>Dive deep into 2D convolutions, edge detection, image sharpening, hybrid images, and multiresolution blending.</p>
-                <a href="project2.html" class="btn">View Project 2</a>
+    <nav class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="index.html">Jessica Nguyen</a>
+            <div class="links">
+                <a href="#projects">Projects</a>
+                <a href="#data">Results</a>
+                <a href="#demo">Interactive</a>
+                <a href="#skills">Skills</a>
             </div>
         </div>
+    </nav>
 
-        <footer>
-            <p>&copy; 2026 CS180 - Computer Vision Course</p>
-        </footer>
-    </div>
+    <header class="hero">
+        <div class="aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+        <canvas id="field" aria-hidden="true"></canvas>
+        <div class="hero-inner">
+            <span class="eyebrow">CS180 · Computer Vision · UC Berkeley · Fall 2026</span><br>
+            <h1 class="rgb-title" aria-label="Jessica Nguyen">
+                <span class="base">Jessica Nguyen</span>
+                <span class="layer b" aria-hidden="true">Jessica Nguyen</span>
+                <span class="layer g" aria-hidden="true">Jessica Nguyen</span>
+                <span class="layer r" aria-hidden="true">Jessica Nguyen</span>
+            </h1>
+            <p class="sub">Computer vision and image processing projects: reconstructing historical color photographs, building filters from scratch, and blending images across frequencies.</p>
+            <p class="hint">↑ the R, G and B channels just aligned themselves, like in Project 1</p>
+            <div class="cta">
+                <a class="btn primary" href="#projects">View projects</a>
+                <a class="btn secondary" href="https://github.com/JessN777" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="stats reveal">
+            <div class="stat"><div class="num" data-count="2">0</div><div class="lbl">projects completed</div></div>
+            <div class="stat"><div class="num" data-count="17">0</div><div class="lbl">historical photos restored</div></div>
+            <div class="stat"><div class="num" data-count="7">0</div><div class="lbl">filtering techniques built</div></div>
+            <div class="stat"><div class="num" data-count="175" data-suffix=" px">0</div><div class="lbl">largest shift recovered</div></div>
+        </div>
+
+        <section id="projects">
+            <div class="section-num">01</div>
+            <h2>Projects</h2>
+            <p class="section-lede">Each project is implemented in Python with NumPy, with the core algorithms written from scratch.</p>
+            <div class="projects">
+                <a class="project reveal" href="project1.html">
+                    <div class="thumb"><img src="thumb_emir.jpg" alt="Aligned Prokudin-Gorskii photograph of the Emir of Bukhara"></div>
+                    <div class="body">
+                        <span class="num">PROJECT 01</span>
+                        <h3>Image Alignment using Pyramid Structures</h3>
+                        <p>Reconstructs full-color images from Prokudin-Gorskii's early-1900s glass plate negatives by aligning the R, G and B channels with a coarse-to-fine image pyramid.</p>
+                        <div class="tags"><span class="tag">Image Pyramids</span><span class="tag">NCC</span><span class="tag">L2</span><span class="tag">Exhaustive Search</span></div>
+                        <span class="go">Read case study <span>→</span></span>
+                    </div>
+                </a>
+                <a class="project reveal" href="project2.html">
+                    <div class="thumb"><img src="proj2/thumb_hybrid.jpg" alt="Hybrid image combining a face and a cat"></div>
+                    <div class="body">
+                        <span class="num">PROJECT 02</span>
+                        <h3>Fun with Filters and Frequencies</h3>
+                        <p>2D convolution from scratch, edge detection, unsharp masking, hybrid images, and multiresolution blending with Gaussian and Laplacian stacks.</p>
+                        <div class="tags"><span class="tag">Convolution</span><span class="tag">Edge Detection</span><span class="tag">Hybrid Images</span><span class="tag">Laplacian Stacks</span></div>
+                        <span class="go">Read case study <span>→</span></span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="data">
+            <div class="section-num">02</div>
+            <h2>Alignment Results at a Glance</h2>
+            <p class="section-lede">How far the green and red channels had to move to line up with blue, for each full-resolution plate in Project 1. The pyramid recovers shifts of more than 100 pixels while only searching ±15 pixels at each level.</p>
+            <div class="panel reveal">
+                <div class="legend"><span><i style="background: var(--green)"></i>Green channel shift (px)</span><span><i style="background: var(--red)"></i>Red channel shift (px)</span></div>
+                <div class="bars" id="bars"></div>
+                <p class="chart-note">Shift magnitude = √(dx² + dy²), from the offsets reported in Project 1.</p>
+            </div>
+        </section>
+
+        <section id="demo">
+            <div class="section-num">03</div>
+            <h2>Try It: Splitting a Signal by Frequency</h2>
+            <p class="section-lede">The core idea behind hybrid images and blending in Project 2. A Gaussian blur keeps the low frequencies; subtracting it from the original leaves the high frequencies. Drag the slider to change σ.</p>
+            <div class="demo-grid reveal">
+                <div class="panel"><canvas id="freq" aria-label="Chart of a signal split into low and high frequency parts"></canvas></div>
+                <div class="panel controls">
+                    <label for="sigma">Gaussian σ <span class="value" id="sigmaVal">6</span></label>
+                    <input type="range" id="sigma" min="1" max="20" value="6">
+                    <div class="toggle" id="toggle">
+                        <button data-k="orig" class="on">Original</button>
+                        <button data-k="low" class="on">Low-pass</button>
+                        <button data-k="high" class="on">High-pass</button>
+                    </div>
+                    <div class="legend" style="flex-direction: column; gap: 8px;">
+                        <span><i style="background: #9aa1b8"></i>Original signal</span>
+                        <span><i style="background: var(--blue)"></i>Low-pass: G ∗ f</span>
+                        <span><i style="background: var(--red)"></i>High-pass: f − G ∗ f</span>
+                    </div>
+                    <p>Larger σ blurs more, so the low-pass curve gets smoother and more of the detail moves into the high-pass curve.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="section-num">04</div>
+            <h2>Skills Demonstrated</h2>
+            <p class="section-lede">Techniques implemented across both projects.</p>
+            <div class="skills">
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><b>Image registration</b><p>Exhaustive and pyramid-based alignment with L2 and NCC scoring.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h4l3-8 4 16 3-8h2"/></svg></div><b>Signal processing</b><p>Convolution from scratch, Gaussian filters, and Fourier analysis.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21 21 3M3 12l9-9M12 21l9-9"/></svg></div><b>Edge detection</b><p>Finite differences, gradient magnitude, and derivative-of-Gaussian filters.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div><b>Image compositing</b><p>Hybrid images and seamless multiresolution blending.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16M6 16l4-4 3 3 5-6"/></svg></div><b>Performance tradeoffs</b><p>Choosing between accuracy and speed, e.g. NCC vs. L2 and loops vs. vectorization.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div><b>Python tooling</b><p>NumPy, SciPy, OpenCV, scikit-image, and Matplotlib.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <a href="project1.html">Project 1</a>
+        <a href="project2.html">Project 2</a>
+        <a href="https://github.com/JessN777" target="_blank" rel="noopener">GitHub</a>
+        <p style="margin-top: 12px;">© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</p>
+    </footer>
+
+    <script>
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const offsets = [
+            ['Church', [3, 24], [-4, 58]],
+            ['Icon', [18, 41], [23, 89]],
+            ['Emir', [18, 41], [23, 89]],
+            ['Harvesters', [18, 59], [15, 124]],
+            ['Ilemselga', [7, 41], [11, 131]],
+            ['Self Portrait', [29, 77], [36, 175]],
+            ['Religious Painting', [4, 27], [7, 69]],
+            ['Siren', [-4, 49], [-23, 96]],
+            ['Generations', [17, 50], [13, 105]],
+            ['Wharf', [17, 50], [13, 105]],
+            ['Melons', [17, 50], [13, 105]],
+        ];
+        const mag = v => Math.hypot(v[0], v[1]);
+        const maxMag = Math.max(...offsets.map(o => mag(o[2])));
+        const barsEl = document.getElementById('bars');
+        offsets.forEach(([name, g, r]) => {
+            const gm = mag(g), rm = mag(r);
+            const row = document.createElement('div');
+            row.className = 'bar-row';
+            row.innerHTML = `<span class="name">${name}</span>
+                <div class="bar-track">
+                    <div class="bar g" data-w="${gm / maxMag * 88}"></div>
+                    <div class="bar r" data-w="${rm / maxMag * 88}"></div>
+                    <span class="bar-val" style="left:calc(${rm / maxMag * 88}% + 8px)">${Math.round(gm)} / ${Math.round(rm)}</span>
+                </div>`;
+            barsEl.appendChild(row);
+        });
+
+        function countUp(el) {
+            const target = +el.dataset.count, suffix = el.dataset.suffix || '';
+            if (reduceMotion) { el.textContent = target + suffix; return; }
+            const start = performance.now(), dur = 1400;
+            const tick = now => {
+                const t = Math.min((now - start) / dur, 1);
+                el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3))) + suffix;
+                if (t < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        }
+
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('visible');
+                e.target.querySelectorAll('[data-count]').forEach(countUp);
+                if (e.target.querySelector('#bars')) {
+                    const bars = e.target.querySelector('#bars');
+                    bars.classList.add('visible');
+                    bars.querySelectorAll('.bar').forEach((b, i) => setTimeout(() => b.style.width = b.dataset.w + '%', reduceMotion ? 0 : i * 40));
+                }
+                io.unobserve(e.target);
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        const field = document.getElementById('field');
+        const fctx = field.getContext('2d');
+        let dots = [];
+        function sizeField() {
+            const dpr = window.devicePixelRatio || 1;
+            field.width = field.clientWidth * dpr;
+            field.height = field.clientHeight * dpr;
+            fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            dots = [];
+            const gap = 28;
+            for (let x = gap / 2; x < field.clientWidth; x += gap)
+                for (let y = gap / 2; y < field.clientHeight; y += gap) dots.push([x, y]);
+        }
+        let mouse = { x: -999, y: -999 };
+        field.parentElement.addEventListener('mousemove', e => {
+            const r = field.getBoundingClientRect();
+            mouse = { x: e.clientX - r.left, y: e.clientY - r.top };
+        });
+        field.parentElement.addEventListener('mouseleave', () => mouse = { x: -999, y: -999 });
+        function drawField(t) {
+            fctx.clearRect(0, 0, field.clientWidth, field.clientHeight);
+            for (const [x, y] of dots) {
+                const wave = reduceMotion ? 0.5 : 0.5 + 0.5 * Math.sin(x * 0.012 + y * 0.008 + t * 0.0008);
+                const d = Math.hypot(x - mouse.x, y - mouse.y);
+                const g = Math.exp(-(d * d) / (2 * 90 * 90));
+                const a = 0.06 + 0.1 * wave + 0.5 * g;
+                const r = 1 + 1.6 * g;
+                fctx.fillStyle = `rgba(190, 196, 255, ${a * 1.4})`;
+                fctx.beginPath(); fctx.arc(x, y, r, 0, Math.PI * 2); fctx.fill();
+            }
+            if (!reduceMotion) requestAnimationFrame(drawField);
+        }
+        sizeField(); requestAnimationFrame(drawField);
+        window.addEventListener('resize', () => { sizeField(); if (reduceMotion) drawField(0); });
+
+        const canvas = document.getElementById('freq');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('sigma');
+        const sigmaVal = document.getElementById('sigmaVal');
+        const show = { orig: true, low: true, high: true };
+        document.querySelectorAll('#toggle button').forEach(b => b.addEventListener('click', () => {
+            show[b.dataset.k] = !show[b.dataset.k];
+            b.classList.toggle('on', show[b.dataset.k]);
+        }));
+
+        const N = 400;
+        function signal(phase) {
+            const s = new Float64Array(N);
+            for (let i = 0; i < N; i++) {
+                const x = i / N;
+                s[i] = 0.6 * Math.sin(2 * Math.PI * 1.5 * x + phase)
+                     + 0.25 * Math.sin(2 * Math.PI * 7 * x - phase * 1.3)
+                     + 0.12 * Math.sin(2 * Math.PI * 23 * x + phase * 2)
+                     + (i > 250 && i < 262 ? 0.5 : 0);
+            }
+            return s;
+        }
+        function blur(s, sigma) {
+            const r = Math.ceil(3 * sigma), k = [];
+            let sum = 0;
+            for (let i = -r; i <= r; i++) { const v = Math.exp(-i * i / (2 * sigma * sigma)); k.push(v); sum += v; }
+            const out = new Float64Array(N);
+            for (let i = 0; i < N; i++) {
+                let acc = 0;
+                for (let j = -r; j <= r; j++) {
+                    let idx = i + j;
+                    if (idx < 0) idx = -idx; if (idx >= N) idx = 2 * N - idx - 2;
+                    acc += s[idx] * k[j + r];
+                }
+                out[i] = acc / sum;
+            }
+            return out;
+        }
+        function plot(arr, color, width, yMid, scale, w) {
+            ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
+            for (let i = 0; i < N; i++) {
+                const x = 40 + (i / (N - 1)) * (w - 56), y = yMid - arr[i] * scale;
+                i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+            }
+            ctx.stroke();
+        }
+        function drawFreq(t) {
+            const dpr = window.devicePixelRatio || 1;
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            const sigma = +slider.value;
+            sigmaVal.textContent = sigma;
+            const phase = reduceMotion ? 0 : t * 0.0006;
+            const s = signal(phase), low = blur(s, sigma), high = s.map((v, i) => v - low[i]);
+            const top = h * 0.36, bot = h * 0.8;
+            ctx.font = '12px Inter, sans-serif'; ctx.fillStyle = '#9aa1c7';
+            ctx.fillText('signal + low-pass', 40, 18);
+            ctx.fillText('high-pass', 40, h * 0.62);
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+            [top, bot].forEach(y => { ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(w - 16, y); ctx.stroke(); });
+            ctx.shadowBlur = 0;
+            if (show.orig) plot(s, 'rgba(200,205,235,0.45)', 1.5, top, h * 0.22, w);
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#4da3ff';
+            if (show.low) plot(low, '#4da3ff', 3, top, h * 0.22, w);
+            ctx.shadowColor = '#ff5c7a';
+            if (show.high) plot(high, '#ff5c7a', 2, bot, h * 0.22, w);
+            ctx.shadowBlur = 0;
+            if (!reduceMotion) requestAnimationFrame(drawFreq);
+        }
+        slider.addEventListener('input', () => { if (reduceMotion) drawFreq(0); });
+        document.getElementById('toggle').addEventListener('click', () => { if (reduceMotion) setTimeout(() => drawFreq(0)); });
+        requestAnimationFrame(drawFreq);
+    </script>
 </body>
 </html>
