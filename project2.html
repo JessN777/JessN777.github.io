@@ -123,7 +123,15 @@
             <h2>Part 1: Filters and Edges</h2>
 
             <h3>Part 1.1: Convolutions from Scratch!</h3>
-            <p class="note">I implemented 2D convolution two ways: with four nested loops (checking every output pixel and every kernel element) and with two loops (checking every output pixel but using NumPy to multiply the kernel and image patch all at once). Both flip the kernel before sliding it across the image, which is correct by definition. Both implementations have time complexity O(H × W × K²), since we process every output pixel and perform K² operations per pixel. The 2-loop version is faster in practice because NumPy's vectorized operations run in compiled C, while the 4-loop version executes K² separate Python multiplications per pixel.</p>
+            <p class="note">I implemented 2D convolution two ways: with four nested loops (checking every output pixel and every kernel element) and with
+                 two loops (checking every output pixel but using NumPy to multiply the kernel and image patch all at once). Both flip the kernel before 
+                 sliding it across the image, which is correct by definition. Both implementations have time complexity O(H × W × K²), since we process every 
+                 output pixel and perform K² operations per pixel. The 2-loop version is faster in practice because NumPy's vectorized operations run in 
+                 compiled C, while the 4-loop version executes K² separate Python multiplications per pixel. Both my implementations match scipy.signal.convolve2d
+                 exactly (up to floating-point rounding). For the 9×9 box filter, the 2-loop version is much faster because NumPy multiplies all 81 kernel elements 
+                 and the corresponding image patch in a single vectorized operation, while the 4-loop version does 81 separate multiplications. For tiny filters 
+                 like Dx and Dy with only 2 elements each, the NumPy overhead is large relative to the work, so the two versions run at similar speed. scipy is 
+                 fastest since it runs compiled C code.</p>
             <figure>
                 <img src="proj2/part_1_1_results.png" alt="Part 1.1 results">
                 <figcaption>My photo in grayscale, convolved with a 9×9 box filter, Dx = [1, −1], and Dy = [1, −1]ᵀ.</figcaption>
