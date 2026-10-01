@@ -3,267 +3,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project 2 - Fun with Filters and Frequencies</title>
+    <title>Filters and Frequencies | Jessica Nguyen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #07091a;
+            --surface: rgba(255,255,255,0.045);
+            --text: #eef0ff;
+            --body: #c9cce6;
+            --muted: #9aa1c7;
+            --border: rgba(255,255,255,0.09);
+            --accent: #8b93ff;
+            --accent-soft: rgba(139,147,255,0.14);
+            --green: #34e39a;
+            --red: #ff5c7a;
+            --blue: #4da3ff;
+            --grad: linear-gradient(90deg, #ff5c7a, #b388ff 40%, #4da3ff 70%, #34e39a);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
         }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background:
+                radial-gradient(600px 400px at 5% 10%, rgba(255,92,122,0.09), transparent 70%),
+                radial-gradient(700px 500px at 95% 35%, rgba(77,163,255,0.09), transparent 70%),
+                radial-gradient(600px 500px at 30% 95%, rgba(52,227,154,0.06), transparent 70%);
         }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            text-align: center;
+        a { color: var(--accent); text-decoration: none; }
+
+        .progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--grad); z-index: 30; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: rgba(7,9,26,0.72); backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
         }
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .topbar-inner {
+            max-width: 1160px; margin: 0 auto; padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
         }
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        .brand { font-weight: 700; color: var(--text); }
+        .toc { display: flex; gap: 4px; font-size: 13px; flex-wrap: wrap; }
+        .toc a {
+            color: var(--muted); font-weight: 500; padding: 5px 10px; border-radius: 999px;
+            font-family: 'JetBrains Mono', monospace; transition: background 0.2s, color 0.2s;
         }
-        .nav {
-            margin-bottom: 30px;
-            text-align: center;
+        .toc a:hover { color: var(--text); }
+        .toc a.active { background: var(--accent-soft); color: #fff; }
+
+        .hero { max-width: 1160px; margin: 0 auto; padding: 90px 24px 40px; }
+        .eyebrow {
+            display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 24px;
         }
-        .nav a {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background 0.3s;
+        .hero h1 {
+            font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em;
+            max-width: 900px;
         }
-        .nav a:hover {
-            background: #764ba2;
+        .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .lede { font-size: 1.2rem; color: var(--body); max-width: 720px; margin-top: 22px; }
+        .meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; font-size: 14px; color: var(--muted); }
+        .meta b { color: var(--text); font-weight: 600; margin-right: 6px; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+        .tag { font-size: 12.5px; font-weight: 500; padding: 5px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+
+        .hero-figure { max-width: 1160px; margin: 20px auto 0; padding: 0 24px; }
+        .hero-figure .frame {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
         }
-        section {
-            background: white;
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .hero-figure .cell {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+            box-shadow: var(--shadow);
         }
-        h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+        .hero-figure .cell img { width: 100%; height: 260px; object-fit: cover; display: block; background: #fff; cursor: zoom-in; }
+        .hero-figure .cell span { display: block; padding: 12px 16px; font-size: 13px; color: var(--muted); }
+        .hero-figure .cell span b { color: var(--text); font-weight: 600; }
+
+        .overview { max-width: 1160px; margin: 60px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .ov {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+            color: inherit; transition: border-color 0.25s, transform 0.25s;
         }
-        h3 {
-            color: #764ba2;
-            margin-top: 30px;
-            margin-bottom: 12px;
+        .ov:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .ov .n { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+        .ov b { display: block; font-size: 15px; margin: 2px 0 4px; }
+        .ov p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+        main { max-width: 1160px; margin: 0 auto; padding: 0 24px 80px; }
+        .part-header { padding-top: 110px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 10px; }
+        .part-header .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .part-header h2 {
+            font-size: 2.3rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(90deg, #fff, #c9ccff); -webkit-background-clip: text; background-clip: text; color: transparent;
         }
-        p {
-            margin-bottom: 12px;
-        }
+
+        .subsection { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding-top: 70px; }
+        .sub-side { position: sticky; top: 90px; align-self: start; }
+        .sub-side .num { font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 500; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sub-side h3 { font-size: 1.25rem; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+        .sub-side .keys { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .sub-side .key { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: baseline; }
+        .sub-side .key::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transform: translateY(-2px); }
+
+        .prose { color: var(--body); font-size: 16.5px; max-width: 780px; }
+        .prose p + p { margin-top: 14px; }
+
         figure {
-            margin: 20px 0;
-            text-align: center;
+            margin-top: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; box-shadow: var(--shadow);
         }
-        figure img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+        figure .img-wrap { background: #fff; padding: 14px; }
+        figure img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+        figure.narrow .img-wrap { display: flex; justify-content: center; }
+        figure.narrow img { max-width: 620px; }
+        figcaption { padding: 14px 18px; font-size: 14px; color: var(--muted); display: flex; gap: 12px; align-items: baseline; }
+        figcaption .fig { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); white-space: nowrap; }
+
+        .callout {
+            margin-top: 24px; padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(139,147,255,0.3);
+            background: var(--accent-soft); color: var(--body); font-size: 15px;
         }
-        figcaption {
-            color: #666;
-            font-size: 0.95em;
-            margin-top: 6px;
+        .callout b { color: #fff; }
+        .callout code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: #fff; }
+
+        .learned {
+            margin-top: 110px; border-radius: 20px; padding: 44px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,92,122,0.12), rgba(139,92,255,0.12) 50%, rgba(77,163,255,0.12));
+            border: 1px solid var(--border);
         }
-        .note {
-            background: #fff8e1;
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            border-radius: 4px;
-            color: #7a5b00;
+        .learned .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .learned h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+        .learned .prose { max-width: 860px; }
+
+        .next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 60px; }
+        .next a {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; color: var(--text);
+            transition: border-color 0.25s, transform 0.25s;
         }
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            margin-top: 40px;
+        .next a:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .next small { display: block; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+        .next b { font-size: 16px; }
+        .next a:last-child { text-align: right; }
+
+        footer { border-top: 1px solid var(--border); padding: 30px 24px; text-align: center; color: var(--muted); font-size: 14px; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(5,6,18,0.92); display: none; z-index: 50;
+            align-items: center; justify-content: center; padding: 30px; cursor: zoom-out; flex-direction: column; gap: 14px;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 8px; background: #fff; }
+        .lightbox p { color: var(--muted); font-size: 14px; text-align: center; max-width: 800px; }
+
+        @media (max-width: 900px) {
+            .subsection { grid-template-columns: 1fr; gap: 18px; }
+            .sub-side { position: static; }
+            .overview { grid-template-columns: repeat(2, 1fr); }
+            .hero-figure .frame { grid-template-columns: 1fr 1fr; }
+            .hero-figure .cell:last-child { display: none; }
+            .toc { display: none; }
+        }
+        @media (max-width: 560px) {
+            .hero, main, .overview, .hero-figure, .topbar-inner { padding-left: 16px; padding-right: 16px; }
+            .hero { padding-top: 60px; }
+            .hero-figure .frame, .overview, .next { grid-template-columns: 1fr; }
+            .hero-figure .cell:last-child { display: block; }
+            .learned { padding: 26px; }
+            .next a:last-child { text-align: left; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { opacity: 1; transform: none; transition: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="nav">
-            <a href="index.html">← Back to CS180</a>
-            <a href="project1.html">← Project 1</a>
+    <div class="progress" id="progress"></div>
+    <nav class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="index.html">← Jessica Nguyen</a>
+            <div class="toc" id="toc">
+                <a href="#p1-1">1.1</a>
+                <a href="#p1-2">1.2</a>
+                <a href="#p1-3">1.3</a>
+                <a href="#p2-1">2.1</a>
+                <a href="#p2-2">2.2</a>
+                <a href="#p2-3">2.3</a>
+                <a href="#p2-4">2.4</a>
+                <a href="#learned">Summary</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <span class="eyebrow">CS180 · Computer Vision · Project 2</span>
+        <h1>Fun with <span class="grad">Filters and Frequencies</span></h1>
+        <p class="lede">Building 2D convolution from scratch, then using it to detect edges, sharpen images, create hybrid images that change with viewing distance, and seamlessly blend images across frequency bands.</p>
+        <div class="meta">
+            <span><b>Author</b>Jessica Nguyen</span>
+            <span><b>Course</b>CS180, UC Berkeley</span>
+            <span><b>Term</b>Fall 2026</span>
+        </div>
+        <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">NumPy</span>
+            <span class="tag">OpenCV</span>
+            <span class="tag">Convolution</span>
+            <span class="tag">Fourier Analysis</span>
+            <span class="tag">Gaussian &amp; Laplacian Stacks</span>
+        </div>
+    </header>
+
+    <div class="hero-figure reveal">
+        <div class="frame">
+            <div class="cell"><img src="proj2/thumb_hybrid.jpg" alt="Hybrid image of a man and a cat"><span><b>Hybrid image</b> · Part 2.2</span></div>
+            <div class="cell"><img src="proj2/part_2_4_oraple_result.png" alt="Oraple blend" style="object-position: 100% 50%;"><span><b>Multiresolution blend</b> · Part 2.4</span></div>
+            <div class="cell"><img src="proj2/part_1_3_comparison.png" alt="Edge detection comparison" style="object-position: 100% 50%;"><span><b>Edge detection</b> · Part 1.3</span></div>
+        </div>
+    </div>
+
+    <div class="overview reveal">
+        <a class="ov" href="#p1-1"><span class="n">PART 1</span><b>Filters &amp; Edges</b><p>Convolution from scratch, finite differences, derivative of Gaussian.</p></a>
+        <a class="ov" href="#p2-1"><span class="n">2.1</span><b>Sharpening</b><p>Unsharp masking by boosting high frequencies.</p></a>
+        <a class="ov" href="#p2-2"><span class="n">2.2</span><b>Hybrid Images</b><p>Low + high frequencies that change with distance.</p></a>
+        <a class="ov" href="#p2-3"><span class="n">2.3 – 2.4</span><b>Stacks &amp; Blending</b><p>Laplacian stacks for seamless image blending.</p></a>
+    </div>
+
+    <main>
+        <div class="part-header">
+            <div class="kicker">PART 1</div>
+            <h2>Filters and Edges</h2>
         </div>
 
-        <header>
-            <h1>Project 2: Fun with Filters and Frequencies!</h1>
-            <p>CS180 Project 2 - Fall 2026</p>
-            <p>By: Jessica Nguyen</p>
-        </header>
-
-        <section>
-            <h2>Part 1: Filters and Edges</h2>
-
-            <h3>Part 1.1: Convolutions from Scratch!</h3>
-            <p class="note">I implemented 2D convolution two ways: with four nested loops (checking every output pixel and every kernel element) and with
-                 two loops (checking every output pixel but using NumPy to multiply the kernel and image patch all at once). Both flip the kernel before 
-                 sliding it across the image, which is correct by definition. Both implementations have time complexity O(H × W × K²), since we process every 
-                 output pixel and perform K² operations per pixel. The 2-loop version is faster in practice because NumPy's vectorized operations run in 
-                 compiled C, while the 4-loop version executes K² separate Python multiplications per pixel. Both my implementations match scipy.signal.convolve2d
-                 exactly (up to floating-point rounding). For the 9×9 box filter, the 2-loop version is much faster because NumPy multiplies all 81 kernel elements 
-                 and the corresponding image patch in a single vectorized operation, while the 4-loop version does 81 separate multiplications. For tiny filters 
-                 like Dx and Dy with only 2 elements each, the NumPy overhead is large relative to the work, so the two versions run at similar speed. scipy is 
-                 fastest since it runs compiled C code.</p>
-            <figure>
-                <img src="proj2/part_1_1_results.png" alt="Part 1.1 results">
-                <figcaption>My photo in grayscale, convolved with a 9×9 box filter, Dx = [1, −1], and Dy = [1, −1]ᵀ.</figcaption>
-            </figure>
-
-            <h3>Part 1.2: Finite Difference Operator</h3>
-            <p class="note">The partial derivatives Dx and Dy measure how fast the image intensity changes in the x and y directions.
-                While on the other hand, the gradient magnitude combines these two derivatives to give a single measure of how fast 
-                the intensity changes in any direction. This gives a single number at each pixel that tells how strong the edge is, 
-                regardless of direction. High magnitude means a sharp change in intensity; low magnitude means a flat region. I thresholded 
-                the gradient magnitude at 0.25 to get a binary edge image. At lower thresholds, the grass texture creates a lot of noise—many 
-                small speckles from fine detail. At higher thresholds, the edges of the cameraman and tripod start breaking up and disappearing.
-            </p>
-            <figure>
-                <img src="proj2/part_1_2_results.png" alt="Part 1.2 results">
-                <figcaption>Partial derivatives, gradient magnitude, and binarized edges.</figcaption>
-            </figure>
-
-            <h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
-            <p class="note">I created a 2D Gaussian kernel by taking a 1D Gaussian from cv2.getGaussianKernel() and taking its outer product with itself. 
-                I then convolved the Gaussian with Dx and Dy to create the Derivative of Gaussian filters. This lets me blur and take the derivative in one 
-                step instead of doing two separate convolutions. I got similar results using both methods. The blurred version also produced much cleaner 
-                edges than the raw finite difference method because the Gaussian reduces some of the noise. I used a lower threshold of 0.08 for the 
-                smoothed image compared to 0.25 for the original.
-            </p>
-            <figure>
-                <img src="proj2/part_1_3_filters.png" alt="Gaussian and DoG filters">
-                <figcaption>The Gaussian filter and the two DoG filters.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_1_3_blur_then_derivative.png" alt="Blur then derivative">
-                <figcaption>Blurring first, then taking derivatives (threshold 0.08).</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_1_3_comparison.png" alt="Edge comparison">
-                <figcaption>Finite difference vs. blur-then-derivative vs. DoG.</figcaption>
-            </figure>
+        <section class="subsection" id="p1-1">
+            <aside class="sub-side">
+                <div class="num">1.1</div>
+                <h3>Convolutions from Scratch</h3>
+                <div class="keys"><span class="key">4-loop &amp; 2-loop versions</span><span class="key">O(H × W × K²)</span><span class="key">Matches scipy</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>I implemented 2D convolution two ways: with four nested loops (checking every output pixel and every kernel element) and with two loops (checking every output pixel but using NumPy to multiply the kernel and image patch all at once). Both flip the kernel before sliding it across the image, which is correct by definition. Both implementations have time complexity O(H × W × K²), since we process every output pixel and perform K² operations per pixel. The 2-loop version is faster in practice because NumPy's vectorized operations run in compiled C, while the 4-loop version executes K² separate Python multiplications per pixel.</p>
+                    <p>Both my implementations match scipy.signal.convolve2d exactly (up to floating-point rounding). For the 9×9 box filter, the 2-loop version is much faster because NumPy multiplies all 81 kernel elements and the corresponding image patch in a single vectorized operation, while the 4-loop version does 81 separate multiplications. For tiny filters like Dx and Dy with only 2 elements each, the NumPy overhead is large relative to the work, so the two versions run at similar speed. scipy is fastest since it runs compiled C code.</p>
+                </div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_1_1_results.png" alt="Part 1.1 results"></div>
+                    <figcaption><span class="fig">FIG 1.1</span>My photo in grayscale, convolved with a 9×9 box filter, Dx = [1, −1], and Dy = [1, −1]ᵀ.</figcaption>
+                </figure>
+            </div>
         </section>
 
-        <section>
-            <h2>Part 2: Applications</h2>
-
-            <h3>Part 2.1: Image "Sharpening"</h3>
-            <p class="note">I used a Gaussian blur to keep the low-frequency parts of the image, which are the smoother features. When I subtract the blurred image from the original, I get the high-frequency parts,
-                 mainly the edges and fine details. I can then add some of those details back to the original using the unsharp mask to make the image look sharper.
-                 When I use a small α, like 0.5, the sharpening is pretty subtle. I can see that the edges are a little clearer, but the image still looks natural. As I increase α, the edges and details become more noticeable. 
-                 When I use a large value like 4, though, the sharpening starts to look too strong. I can see halos around some of the edges, and the noise also becomes more noticeable. For these images, I found that α = 1 or 2 gives a good balance between making the details clearer and keeping the image looking natural.</p>
-            <figure>
-                <img src="proj2/part_2_1_taj.png" alt="Taj Mahal sharpening">
-                <figcaption>Taj Mahal: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_1_taj_amounts.png" alt="Taj Mahal sharpening amounts">
-                <figcaption>Increasing α makes edges crisper, but large values exaggerate noise and create halos.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_1_dog.png" alt="Dog sharpening">
-                <figcaption>My own image: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_1_dog_amounts.png" alt="Dog sharpening amounts">
-                <figcaption>Different sharpening amounts on my own image.</figcaption>
-            </figure>
-
-            <h3>Part 2.2: Hybrid Images</h3>
-            <p class="note">For my hybrid images, I combined the high-frequency parts of one image with the low-frequency parts of another. I first aligned each pair of images by matching two corresponding points, such as the eyes, so that the 
-                images were the same size and rotation. Then I used a Gaussian blur with σ₁ = 5.0 on one image and subtracted it from the original to get the high-frequency details. For the other image, I used a Gaussian blur with σ₂ = 7.0 to 
-                keep the low-frequency parts, and then added the two images together to create the hybrid. I noticed that the result looks different depending on how far away I am from the image. When I look at it up close, I mostly see the 
-                high-frequency image because the sharper details stand out more. When I look at it from farther away, the high-frequency details are harder to see, so the low-frequency image becomes more noticeable. I also found that the σ values 
-                affect how much detail gets kept in each image. A smaller σ keeps more of the sharper details, while a larger σ smooths the image more. I chose σ₁ = 5.0 and σ₂ = 7.0 so that the two frequency ranges would be separated more and not 
-                overlap as much.</p>
-            <figure>
-                <img src="proj2/part_2_2_DerekPicture_nutmeg_process.png" alt="Derek and Nutmeg hybrid process">
-                <figcaption>Derek + Nutmeg: aligned inputs, filtered results, and final hybrid.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_2_DerekPicture_nutmeg_fft.png" alt="Derek and Nutmeg Fourier transforms">
-                <figcaption>Log magnitude of the Fourier transforms of the inputs, filtered images, and hybrid.</figcaption>
-            </figure>
-
-            <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
-            <p class="note">A stack is basically like a pyramid, except I don't downsample the image. Every level stays the same size as the original image. For the Gaussian stack, I blur the previous level again at each step, 
-                with σ doubling each time. This lets me look at the image at different scales while keeping everything at the same resolution. For the Laplacian stack, I take the difference between two neighboring Gaussian levels. 
-                This gives me the edges and details that are present at that particular scale. The last level is just the blurriest Gaussian level, which contains the coarsest features. If I add all of the Laplacian levels back together, 
-                I can reconstruct the original image. The main difference between a stack and a pyramid is that a pyramid downsamples the image at each level, so each level gets smaller. A stack keeps the same image size at every level. 
-                This uses more memory, but I found it easier to use for blending since I don't have to resize the images between levels.</p>
-            <figure>
-                <img src="proj2/part_2_3_apple_stacks.png" alt="Apple stacks">
-                <figcaption>Apple: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_3_orange_stacks.png" alt="Orange stacks">
-                <figcaption>Orange: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
-            </figure>
-
-            <h3>Part 2.4: Multiresolution Blending</h3>
-            <p class="note">To blend the two images together, I made a Laplacian stack for each image and a Gaussian stack for the mask. At each level, I used the mask at that level to decide 
-                how much of each image to keep, and then I added all the levels together at the end. Using the blurred mask helps make the transition between the two images smoother instead of 
-                having a really obvious seam. For the oraple, I used a vertical step mask where the left side was the apple and the right side was the orange. After putting the mask through the 
-                Gaussian stack, the edge between the two images becomes more gradual, so the details near the seam blend together better.For my own blends with the dog and cat, I tried both a 
-                vertical seam and a circular mask. I found that the circular mask made the transition look more natural because the edges of the mask are softer.</p>
-            <figure>
-                <img src="proj2/part_2_4_oraple_result.png" alt="Oraple">
-                <figcaption>The oraple, blended with a vertical step mask.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_4_oraple_process.png" alt="Oraple process">
-                <figcaption>Recreating Figure 3.42: masked apple, masked orange, and blended Laplacian levels 0, 2, and 4 (a–i), and the collapsed results (j–l).</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_4_dog_cat_vertical_result.png" alt="Dog and cat vertical blend">
-                <figcaption>My own images blended with a vertical seam.</figcaption>
-            </figure>
-            <figure>
-                <img src="proj2/part_2_4_cat_dog_circle_result.png" alt="Cat and dog circle blend">
-                <figcaption>My own images blended with an irregular (circular) mask.</figcaption>
-            </figure>
+        <section class="subsection" id="p1-2">
+            <aside class="sub-side">
+                <div class="num">1.2</div>
+                <h3>Finite Difference Operator</h3>
+                <div class="keys"><span class="key">Partial derivatives</span><span class="key">Gradient magnitude</span><span class="key">Threshold = 0.25</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>The partial derivatives Dx and Dy measure how fast the image intensity changes in the x and y directions. While on the other hand, the gradient magnitude combines these two derivatives to give a single measure of how fast the intensity changes in any direction. This gives a single number at each pixel that tells how strong the edge is, regardless of direction. High magnitude means a sharp change in intensity; low magnitude means a flat region.</p>
+                    <p>I thresholded the gradient magnitude at 0.25 to get a binary edge image. At lower thresholds, the grass texture creates a lot of noise—many small speckles from fine detail. At higher thresholds, the edges of the cameraman and tripod start breaking up and disappearing.</p>
+                </div>
+                <div class="callout reveal"><b>Gradient magnitude:</b> <span class="mono">|∇I| = √( (∂I/∂x)² + (∂I/∂y)² )</span></div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_1_2_results.png" alt="Part 1.2 results"></div>
+                    <figcaption><span class="fig">FIG 1.2</span>Partial derivatives, gradient magnitude, and binarized edges.</figcaption>
+                </figure>
+            </div>
         </section>
 
-        <section>
+        <section class="subsection" id="p1-3">
+            <aside class="sub-side">
+                <div class="num">1.3</div>
+                <h3>Derivative of Gaussian (DoG) Filter</h3>
+                <div class="keys"><span class="key">Gaussian: size 9, σ = 1.5</span><span class="key">Blur + derivative in one filter</span><span class="key">Threshold = 0.08</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>I created a 2D Gaussian kernel by taking a 1D Gaussian from cv2.getGaussianKernel() and taking its outer product with itself. I then convolved the Gaussian with Dx and Dy to create the Derivative of Gaussian filters. This lets me blur and take the derivative in one step instead of doing two separate convolutions. I got similar results using both methods.</p>
+                    <p>The blurred version also produced much cleaner edges than the raw finite difference method because the Gaussian reduces some of the noise. I used a lower threshold of 0.08 for the smoothed image compared to 0.25 for the original.</p>
+                </div>
+                <figure class="reveal narrow">
+                    <div class="img-wrap"><img src="proj2/part_1_3_filters.png" alt="Gaussian and DoG filters"></div>
+                    <figcaption><span class="fig">FIG 1.3a</span>The Gaussian filter and the two DoG filters.</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_1_3_blur_then_derivative.png" alt="Blur then derivative"></div>
+                    <figcaption><span class="fig">FIG 1.3b</span>Blurring first, then taking derivatives (threshold 0.08).</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_1_3_comparison.png" alt="Edge comparison"></div>
+                    <figcaption><span class="fig">FIG 1.3c</span>Finite difference vs. blur-then-derivative vs. DoG.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <div class="part-header">
+            <div class="kicker">PART 2</div>
+            <h2>Applications</h2>
+        </div>
+
+        <section class="subsection" id="p2-1">
+            <aside class="sub-side">
+                <div class="num">2.1</div>
+                <h3>Image "Sharpening"</h3>
+                <div class="keys"><span class="key">Unsharp mask filter</span><span class="key">α = 0.5, 1, 2, 4</span><span class="key">Best: α = 1–2</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>I used a Gaussian blur to keep the low-frequency parts of the image, which are the smoother features. When I subtract the blurred image from the original, I get the high-frequency parts, mainly the edges and fine details. I can then add some of those details back to the original using the unsharp mask to make the image look sharper.</p>
+                    <p>When I use a small α, like 0.5, the sharpening is pretty subtle. I can see that the edges are a little clearer, but the image still looks natural. As I increase α, the edges and details become more noticeable. When I use a large value like 4, though, the sharpening starts to look too strong. I can see halos around some of the edges, and the noise also becomes more noticeable. For these images, I found that α = 1 or 2 gives a good balance between making the details clearer and keeping the image looking natural.</p>
+                </div>
+                <div class="callout reveal"><b>Unsharp mask:</b> <span class="mono">sharpened = f + α · (f − G ∗ f)</span></div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_1_taj.png" alt="Taj Mahal sharpening"></div>
+                    <figcaption><span class="fig">FIG 2.1a</span>Taj Mahal: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_1_taj_amounts.png" alt="Taj Mahal sharpening amounts"></div>
+                    <figcaption><span class="fig">FIG 2.1b</span>Increasing α makes edges crisper, but large values exaggerate noise and create halos.</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_1_dog.png" alt="Dog sharpening"></div>
+                    <figcaption><span class="fig">FIG 2.1c</span>My own image: original, blurred, high frequencies, and sharpened (α = 1).</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_1_dog_amounts.png" alt="Dog sharpening amounts"></div>
+                    <figcaption><span class="fig">FIG 2.1d</span>Different sharpening amounts on my own image.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="subsection" id="p2-2">
+            <aside class="sub-side">
+                <div class="num">2.2</div>
+                <h3>Hybrid Images</h3>
+                <div class="keys"><span class="key">Two-point alignment</span><span class="key">High-pass σ₁ = 5.0</span><span class="key">Low-pass σ₂ = 7.0</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>For my hybrid images, I combined the high-frequency parts of one image with the low-frequency parts of another. I first aligned each pair of images by matching two corresponding points, such as the eyes, so that the images were the same size and rotation. Then I used a Gaussian blur with σ₁ = 5.0 on one image and subtracted it from the original to get the high-frequency details. For the other image, I used a Gaussian blur with σ₂ = 7.0 to keep the low-frequency parts, and then added the two images together to create the hybrid.</p>
+                    <p>I noticed that the result looks different depending on how far away I am from the image. When I look at it up close, I mostly see the high-frequency image because the sharper details stand out more. When I look at it from farther away, the high-frequency details are harder to see, so the low-frequency image becomes more noticeable. I also found that the σ values affect how much detail gets kept in each image. A smaller σ keeps more of the sharper details, while a larger σ smooths the image more. I chose σ₁ = 5.0 and σ₂ = 7.0 so that the two frequency ranges would be separated more and not overlap as much.</p>
+                </div>
+                <div class="callout reveal"><b>Hybrid:</b> <span class="mono">H = (f₁ − G<sub>σ₁</sub> ∗ f₁) + G<sub>σ₂</sub> ∗ f₂</span></div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_2_DerekPicture_nutmeg_process.png" alt="Derek and Nutmeg hybrid process"></div>
+                    <figcaption><span class="fig">FIG 2.2a</span>Derek + Nutmeg: aligned inputs, filtered results, and final hybrid.</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_2_DerekPicture_nutmeg_fft.png" alt="Derek and Nutmeg Fourier transforms"></div>
+                    <figcaption><span class="fig">FIG 2.2b</span>Log magnitude of the Fourier transforms of the inputs, filtered images, and hybrid.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="subsection" id="p2-3">
+            <aside class="sub-side">
+                <div class="num">2.3</div>
+                <h3>Gaussian and Laplacian Stacks</h3>
+                <div class="keys"><span class="key">No downsampling</span><span class="key">σ doubles each level</span><span class="key">Sum of Laplacians = original</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>A stack is basically like a pyramid, except I don't downsample the image. Every level stays the same size as the original image. For the Gaussian stack, I blur the previous level again at each step, with σ doubling each time. This lets me look at the image at different scales while keeping everything at the same resolution. For the Laplacian stack, I take the difference between two neighboring Gaussian levels. This gives me the edges and details that are present at that particular scale. The last level is just the blurriest Gaussian level, which contains the coarsest features. If I add all of the Laplacian levels back together, I can reconstruct the original image.</p>
+                    <p>The main difference between a stack and a pyramid is that a pyramid downsamples the image at each level, so each level gets smaller. A stack keeps the same image size at every level. This uses more memory, but I found it easier to use for blending since I don't have to resize the images between levels.</p>
+                </div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_3_apple_stacks.png" alt="Apple stacks"></div>
+                    <figcaption><span class="fig">FIG 2.3a</span>Apple: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_3_orange_stacks.png" alt="Orange stacks"></div>
+                    <figcaption><span class="fig">FIG 2.3b</span>Orange: Gaussian stack (top) and Laplacian stack (bottom).</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="subsection" id="p2-4">
+            <aside class="sub-side">
+                <div class="num">2.4</div>
+                <h3>Multiresolution Blending</h3>
+                <div class="keys"><span class="key">Laplacian stack per image</span><span class="key">Gaussian stack of mask</span><span class="key">Step &amp; circular masks</span></div>
+            </aside>
+            <div>
+                <div class="prose reveal">
+                    <p>To blend the two images together, I made a Laplacian stack for each image and a Gaussian stack for the mask. At each level, I used the mask at that level to decide how much of each image to keep, and then I added all the levels together at the end. Using the blurred mask helps make the transition between the two images smoother instead of having a really obvious seam.</p>
+                    <p>For the oraple, I used a vertical step mask where the left side was the apple and the right side was the orange. After putting the mask through the Gaussian stack, the edge between the two images becomes more gradual, so the details near the seam blend together better. For my own blends with the dog and cat, I tried both a vertical seam and a circular mask. I found that the circular mask made the transition look more natural because the edges of the mask are softer.</p>
+                </div>
+                <div class="callout reveal"><b>Blend at level i:</b> <span class="mono">L<sub>i</sub> = G<sub>i</sub>(M) · L<sub>i</sub>(A) + (1 − G<sub>i</sub>(M)) · L<sub>i</sub>(B)</span></div>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_4_oraple_result.png" alt="Oraple"></div>
+                    <figcaption><span class="fig">FIG 2.4a</span>The oraple, blended with a vertical step mask.</figcaption>
+                </figure>
+                <figure class="reveal narrow">
+                    <div class="img-wrap"><img src="proj2/part_2_4_oraple_process.png" alt="Oraple process"></div>
+                    <figcaption><span class="fig">FIG 2.4b</span>Recreating Figure 3.42: masked apple, masked orange, and blended Laplacian levels 0, 2, and 4 (a–i), and the collapsed results (j–l).</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_4_dog_cat_vertical_result.png" alt="Dog and cat vertical blend"></div>
+                    <figcaption><span class="fig">FIG 2.4c</span>My own images blended with a vertical seam.</figcaption>
+                </figure>
+                <figure class="reveal">
+                    <div class="img-wrap"><img src="proj2/part_2_4_cat_dog_circle_result.png" alt="Cat and dog circle blend"></div>
+                    <figcaption><span class="fig">FIG 2.4d</span>My own images blended with an irregular (circular) mask.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="learned reveal" id="learned">
+            <div class="kicker">SUMMARY</div>
             <h2>What I Learned</h2>
-            <p class="note">This project taught me how useful frequency decomposition can be for image processing. I learned that instead of working with the whole image at once, 
-                I can separate it into different scales or frequency ranges and work with each part separately. With Laplacian stacks, for example, I can blend images at different 
-                scales instead of just trying to match the pixels directly. This made it easier to get a smoother transition between the images.I also noticed that the pyramid idea 
-                came up in a lot of different parts of the project. I used a coarse-to-fine approach for image alignment, Gaussian blurs to separate low and high frequencies for sharpening, 
-                and Laplacian stacks to blend images at different scales. Seeing the same idea used in all of these different tasks helped me understand why pyramids are so useful in 
-                computer vision. Instead of trying to solve everything at the full image scale, I can break the problem down and work with the image at different levels.</p>
+            <div class="prose">
+                <p>This project taught me how useful frequency decomposition can be for image processing. I learned that instead of working with the whole image at once, I can separate it into different scales or frequency ranges and work with each part separately. With Laplacian stacks, for example, I can blend images at different scales instead of just trying to match the pixels directly. This made it easier to get a smoother transition between the images.</p>
+                <p>I also noticed that the pyramid idea came up in a lot of different parts of the project. I used a coarse-to-fine approach for image alignment, Gaussian blurs to separate low and high frequencies for sharpening, and Laplacian stacks to blend images at different scales. Seeing the same idea used in all of these different tasks helped me understand why pyramids are so useful in computer vision. Instead of trying to solve everything at the full image scale, I can break the problem down and work with the image at different levels.</p>
+            </div>
         </section>
 
-        <footer>
-            <p>&copy; 2026 CS180 - Computer Vision Course</p>
-        </footer>
-    </div>
+        <div class="next">
+            <a href="project1.html"><small>← PREVIOUS</small><b>Project 1: Image Alignment</b></a>
+            <a href="index.html"><small>BACK TO →</small><b>All Projects</b></a>
+        </div>
+    </main>
+
+    <footer>© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</footer>
+
+    <div class="lightbox" id="lightbox"><img alt=""><p></p></div>
+
+    <script>
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        const progress = document.getElementById('progress');
+        const sections = [...document.querySelectorAll('.subsection, #learned')];
+        const links = [...document.querySelectorAll('#toc a')];
+        function onScroll() {
+            const h = document.documentElement;
+            progress.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+            let current = null;
+            sections.forEach(s => { if (s.getBoundingClientRect().top < 140) current = s.id; });
+            links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('img');
+        const lbCap = lb.querySelector('p');
+        document.querySelectorAll('figure img, .hero-figure img').forEach(img => {
+            img.addEventListener('click', () => {
+                lbImg.src = img.src;
+                lbImg.alt = img.alt;
+                const cap = img.closest('figure')?.querySelector('figcaption');
+                lbCap.textContent = cap ? cap.textContent : img.alt;
+                lb.classList.add('open');
+            });
+        });
+        lb.addEventListener('click', () => lb.classList.remove('open'));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+    </script>
 </body>
 </html>
