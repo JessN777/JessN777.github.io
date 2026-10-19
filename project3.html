@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun with Flow Models | Jessica Nguyen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07091a;
+            --surface: rgba(255,255,255,0.045);
+            --text: #eef0ff;
+            --body: #c9cce6;
+            --muted: #9aa1c7;
+            --border: rgba(255,255,255,0.09);
+            --accent: #8b93ff;
+            --accent-soft: rgba(139,147,255,0.14);
+            --green: #34e39a;
+            --red: #ff5c7a;
+            --blue: #4da3ff;
+            --grad: linear-gradient(90deg, #ff5c7a, #b388ff 40%, #4da3ff 70%, #34e39a);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background:
+                radial-gradient(600px 400px at 5% 10%, rgba(255,92,122,0.09), transparent 70%),
+                radial-gradient(700px 500px at 95% 35%, rgba(77,163,255,0.09), transparent 70%),
+                radial-gradient(600px 500px at 30% 95%, rgba(52,227,154,0.06), transparent 70%);
+        }
+        a { color: var(--accent); text-decoration: none; }
+
+        .progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--grad); z-index: 30; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: rgba(7,9,26,0.72); backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner {
+            max-width: 1160px; margin: 0 auto; padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+        }
+        .brand { font-weight: 700; color: var(--text); }
+        .toc { display: flex; gap: 4px; font-size: 13px; flex-wrap: wrap; }
+        .toc a {
+            color: var(--muted); font-weight: 500; padding: 5px 10px; border-radius: 999px;
+            font-family: 'JetBrains Mono', monospace; transition: background 0.2s, color 0.2s;
+        }
+        .toc a:hover { color: var(--text); }
+        .toc a.active { background: var(--accent-soft); color: #fff; }
+
+        .hero { max-width: 1160px; margin: 0 auto; padding: 90px 24px 40px; }
+        .eyebrow {
+            display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em;
+            max-width: 900px;
+        }
+        .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .lede { font-size: 1.2rem; color: var(--body); max-width: 720px; margin-top: 22px; }
+        .meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; font-size: 14px; color: var(--muted); }
+        .meta b { color: var(--text); font-weight: 600; margin-right: 6px; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+        .tag { font-size: 12.5px; font-weight: 500; padding: 5px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+
+        .hero-figure { max-width: 1160px; margin: 20px auto 0; padding: 0 24px; }
+        .hero-figure .frame {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .hero-figure .cell {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .hero-figure .cell img { width: 100%; height: 260px; object-fit: cover; display: block; background: #fff; cursor: zoom-in; }
+        .hero-figure .cell span { display: block; padding: 12px 16px; font-size: 13px; color: var(--muted); }
+        .hero-figure .cell span b { color: var(--text); font-weight: 600; }
+
+        .overview { max-width: 1160px; margin: 60px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .ov {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+            color: inherit; transition: border-color 0.25s, transform 0.25s;
+        }
+        .ov:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .ov .n { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+        .ov b { display: block; font-size: 15px; margin: 2px 0 4px; }
+        .ov p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+        main { max-width: 1160px; margin: 0 auto; padding: 0 24px 80px; }
+        .part-header { padding-top: 110px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 10px; }
+        .part-header .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .part-header h2 {
+            font-size: 2.3rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(90deg, #fff, #c9ccff); -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        .subsection { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding-top: 70px; }
+        .sub-side { position: sticky; top: 90px; align-self: start; }
+        .sub-side .num { font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 500; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sub-side h3 { font-size: 1.25rem; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+        .sub-side .keys { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .sub-side .key { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: baseline; }
+        .sub-side .key::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transform: translateY(-2px); }
+
+        .prose { color: var(--body); font-size: 16.5px; max-width: 780px; }
+        .prose p + p { margin-top: 14px; }
+
+        figure {
+            margin-top: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; box-shadow: var(--shadow);
+        }
+        figure .img-wrap { background: #fff; padding: 14px; }
+        figure img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+        figure.narrow .img-wrap { display: flex; justify-content: center; }
+        figure.narrow img { max-width: 620px; }
+        figcaption { padding: 14px 18px; font-size: 14px; color: var(--muted); display: flex; gap: 12px; align-items: baseline; }
+        figcaption .fig { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); white-space: nowrap; }
+
+        .callout {
+            margin-top: 24px; padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(139,147,255,0.3);
+            background: var(--accent-soft); color: var(--body); font-size: 15px;
+        }
+        .callout b { color: #fff; }
+        .callout code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: #fff; }
+
+        .learned {
+            margin-top: 110px; border-radius: 20px; padding: 44px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,92,122,0.12), rgba(139,92,255,0.12) 50%, rgba(77,163,255,0.12));
+            border: 1px solid var(--border);
+        }
+        .learned .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .learned h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+        .learned .prose { max-width: 860px; }
+
+        .next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 60px; }
+        .next a {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; color: var(--text);
+            transition: border-color 0.25s, transform 0.25s;
+        }
+        .next a:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .next small { display: block; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+        .next b { font-size: 16px; }
+        .next a:last-child { text-align: right; }
+
+        footer { border-top: 1px solid var(--border); padding: 30px 24px; text-align: center; color: var(--muted); font-size: 14px; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(5,6,18,0.92); display: none; z-index: 50;
+            align-items: center; justify-content: center; padding: 30px; cursor: zoom-out; flex-direction: column; gap: 14px;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 8px; background: #fff; }
+        .lightbox p { color: var(--muted); font-size: 14px; text-align: center; max-width: 800px; }
+
+        @media (max-width: 900px) {
+            .subsection { grid-template-columns: 1fr; gap: 18px; }
+            .sub-side { position: static; }
+            .overview { grid-template-columns: repeat(2, 1fr); }
+            .hero-figure .frame { grid-template-columns: 1fr 1fr; }
+            .hero-figure .cell:last-child { display: none; }
+            .toc { display: none; }
+        }
+        @media (max-width: 560px) {
+            .hero, main, .overview, .hero-figure, .topbar-inner { padding-left: 16px; padding-right: 16px; }
+            .hero { padding-top: 60px; }
+            .hero-figure .frame, .overview, .next { grid-template-columns: 1fr; }
+            .hero-figure .cell:last-child { display: block; }
+            .learned { padding: 26px; }
+            .next a:last-child { text-align: left; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+        }
+    </style>
+<style>.placeholder{padding:38px 24px;border:1px dashed rgba(139,147,255,.4);border-radius:12px;background:rgba(139,147,255,.04);color:var(--muted);text-align:center;margin-top:24px}.placeholder b{display:block;color:var(--text);margin-bottom:6px}.equation{padding:20px;font:clamp(14px,2.4vw,20px) 'JetBrains Mono',monospace;color:var(--text);background:var(--surface);border-radius:12px;margin:20px 0;overflow:auto}.flow-demo{margin-top:30px;padding:24px;border:1px solid var(--border);border-radius:16px;background:var(--surface)}canvas{display:block;width:100%;height:180px;border-radius:10px;margin:18px 0;image-rendering:pixelated}input[type=range]{width:100%;accent-color:var(--accent)}a:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:5px}.draft{color:var(--green)}@media print{.topbar,.progress,.flow-demo{display:none}body{background:white;color:#111}.prose,.lede,.placeholder,.meta,.key{color:#333!important}.subsection{break-inside:avoid}.grad,.num,.part-header h2{background:none!important;color:#222!important}.sub-side{position:static}}</style></head>
+<body><div class="progress" id="progress"></div><nav class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">← Jessica Nguyen</a><div class="toc" id="toc"><a href="#a-training">PART A · 01</a><a href="#a-guidance">PART A · 02</a><a href="#a-creative">PART A · 03</a><a href="#b-denoiser">PART B · 01</a><a href="#b-flow">PART B · 02</a></div></div></nav><header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 3</span><h1>Fun with <span class="grad">Flow Models</span></h1><p class="lede">Write a short introduction to your project here.</p><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span><span class="draft">Work in progress</span></div><div class="tags"><span class="tag">PyTorch</span><span class="tag">PixNerd</span><span class="tag">Euler Sampling</span><span class="tag">Classifier-Free Guidance</span><span class="tag">UNet</span><span class="tag">MNIST</span></div></header><div class="overview"><a class="ov" href="#a-training"><span class="n">PART A · 01</span><b>Visualizing Training and Sampling</b><p>6 report sections</p></a><a class="ov" href="#a-guidance"><span class="n">PART A · 02</span><b>Conditional Generation and Guidance</b><p>1 report sections</p></a><a class="ov" href="#a-creative"><span class="n">PART A · 03</span><b>Creative Applications</b><p>4 report sections</p></a><a class="ov" href="#b-denoiser"><span class="n">PART B · 01</span><b>Training a Single-Step Denoising UNet</b><p>2 report sections</p></a><a class="ov" href="#b-flow"><span class="n">PART B · 02</span><b>Training a Flow Matching Model</b><p>2 report sections</p></a></div><main><div class="callout"><b>Draft report.</b> Fill in each section with your own explanation, images, settings, and observations. The prompts below are editing reminders; replace them before submitting.</div><section id="a-training"><div class="part-header"><span class="kicker">PART A · 01</span><h2>Visualizing Training and Sampling</h2></div><section class="subsection"><div class="sub-side"><div class="num">A 1.1</div><h3>Constructing Noisy Training Inputs</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Original image and noisy inputs at t = 0.25, 0.50, and 0.75.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 1.2</div><h3>Classical Denoising</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Gaussian-blurred results; record the blur settings.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 1.3</div><h3>One-Step Denoising</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>One-step predictions at the required noise levels.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 1.4</div><h3>Visualizing Velocity</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Predicted and ground-truth velocities, with the visualization scaling explained.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 1.5</div><h3>Iterative Denoising with Euler Sampling</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Intermediate trajectory and final denoising comparison; record step count and schedule.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 1.6</div><h3>Generating Images from Noise</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Generated samples, exact prompts, seeds, and sampling settings.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section></section><section id="a-guidance"><div class="part-header"><span class="kicker">PART A · 02</span><h2>Conditional Generation and Guidance</h2></div><section class="subsection"><div class="sub-side"><div class="num">A 2.1</div><h3>Classifier-Free Guidance</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Guidance comparison and generated samples; record guidance scales, prompts, and seeds.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section></section><section id="a-creative"><div class="part-header"><span class="kicker">PART A · 03</span><h2>Creative Applications</h2></div><section class="subsection"><div class="sub-side"><div class="num">A 3.1</div><h3>Image-to-Image Editing</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Edits of the required images, a web image, and drawings across the requested noise levels.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 3.2</div><h3>Text-Guided Image Editing</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Originals and edits, with prompts and starting times.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 3.3</div><h3>Visual Anagrams</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Anagram results in both orientations, with both prompts.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">A 3.4</div><h3>Hybrid Images</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Hybrid results at full and reduced size, with prompts and filter settings.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section></section><section id="b-denoiser"><div class="part-header"><span class="kicker">PART B · 01</span><h2>Training a Single-Step Denoising UNet</h2></div><section class="subsection"><div class="sub-side"><div class="num">B 1.1</div><h3>Implementing the UNet</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Architecture summary and implementation details.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">B 1.2</div><h3>Training and Evaluating the Denoiser</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Training loss; clean/noisy/denoised comparisons; out-of-distribution tests; pure-noise outputs. Add actual training settings and observations.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section></section><section id="b-flow"><div class="part-header"><span class="kicker">PART B · 02</span><h2>Training a Flow Matching Model</h2></div><section class="subsection"><div class="sub-side"><div class="num">B 2.1–2.3</div><h3>Time-Conditioned Flow Matching</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Time-conditioning design, training loss, and samples at the required checkpoints.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section><section class="subsection"><div class="sub-side"><div class="num">B 2.4–2.6</div><h3>Class-Conditioned Flow Matching</h3><div class="keys"><span class="key">Results pending</span></div></div><div><div class="prose"><p><em>Write your explanation here: what you implemented, which settings you used, and what you observed.</em></p></div><div class="placeholder"><b>Add experiment results</b>Class-conditioning design, training loss, and class-by-class sample grids with guidance and sampling settings.</div><!-- Replace this placeholder with a figure and descriptive caption. --></div></section></section><section class="learned" id="learned"><div class="kicker">REFLECTION</div><h2>What I Learned</h2><p class="prose">To complete after the experiments: compare one-step and iterative denoising, describe how guidance changed the outputs, and discuss what worked or failed when training the MNIST models.</p></section><div class="next"><a href="project2.html"><small>← PREVIOUS</small><b>Project 2: Filters &amp; Frequencies</b></a><a href="index.html"><small>BACK TO →</small><b>All Projects</b></a></div><p style="margin-top:32px;color:var(--muted)">Assignment: <a href="https://cal-cs180.github.io/fa26/hw/proj3-flow/parta.html">Part A</a> · <a href="https://cal-cs180.github.io/fa26/hw/proj3-flow/partb.html">Part B</a></p></main><footer>© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</footer><script>
+const links=[...document.querySelectorAll('#toc a')];function scroll(){const h=document.documentElement;document.getElementById('progress').style.width=100*h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)+'%';let id='';document.querySelectorAll('main>section[id]').forEach(s=>{if(s.getBoundingClientRect().top<160)id=s.id});links.forEach(a=>a.classList.toggle('active',a.hash==='#'+id))}window.addEventListener('scroll',scroll,{passive:true});scroll();</script></body></html>

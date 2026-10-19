@@ -1,0 +1,1 @@
+Copy these HTML files into the root of your existing repository. Project 3 contains section headings and editing prompts only. Replace prompts with your own explanations and figures before submitting. Existing image assets stay in place.
