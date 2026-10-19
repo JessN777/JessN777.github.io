@@ -124,6 +124,12 @@
         .project .thumb { height: 260px; overflow: hidden; background: #0b0e24; }
         .project .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
         .project:hover .thumb img { transform: scale(1.05); }
+        .project .thumb.flow { position: relative; background:
+            radial-gradient(420px 220px at 18% 70%, rgba(255,92,122,0.35), transparent 70%),
+            radial-gradient(380px 240px at 78% 30%, rgba(77,163,255,0.4), transparent 70%),
+            #0b0e24; }
+        .project .thumb.flow svg { width: 100%; height: 100%; display: block; transition: transform 0.6s; }
+        .project:hover .thumb.flow svg { transform: scale(1.05); }
         .project .body { padding: 26px; display: flex; flex-direction: column; flex: 1; }
         .project .num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
         .project h3 { font-size: 1.4rem; font-weight: 700; margin: 4px 0 10px; letter-spacing: -0.01em; }
@@ -232,7 +238,7 @@
                 <span class="layer g" aria-hidden="true">Jessica Nguyen</span>
                 <span class="layer r" aria-hidden="true">Jessica Nguyen</span>
             </h1>
-            <p class="sub">Computer vision and image processing projects: reconstructing historical color photographs, building filters from scratch, and blending images across frequencies.</p>
+            <p class="sub">Computer vision projects: reconstructing historical color photographs, building filters from scratch, blending images across frequencies, and generating images with flow models.</p>
             <p class="hint">↑ the R, G and B channels just aligned themselves, like in Project 1</p>
             <div class="cta">
                 <a class="btn primary" href="#projects">View projects</a>
@@ -252,7 +258,7 @@
         <section id="projects">
             <div class="section-num">01</div>
             <h2>Projects</h2>
-            <p class="section-lede">Each project is implemented in Python with NumPy, with the core algorithms written from scratch.</p>
+            <p class="section-lede">Each project is implemented in Python, with the core algorithms written from scratch.</p>
             <div class="projects">
                 <a class="project reveal" href="project1.html">
                     <div class="thumb"><img src="thumb_emir.jpg" alt="Aligned Prokudin-Gorskii photograph of the Emir of Bukhara"></div>
@@ -271,6 +277,45 @@
                         <h3>Fun with Filters and Frequencies</h3>
                         <p>2D convolution from scratch, edge detection, unsharp masking, hybrid images, and multiresolution blending with Gaussian and Laplacian stacks.</p>
                         <div class="tags"><span class="tag">Convolution</span><span class="tag">Edge Detection</span><span class="tag">Hybrid Images</span><span class="tag">Laplacian Stacks</span></div>
+                        <span class="go">Read case study <span>→</span></span>
+                    </div>
+                </a>
+                <a class="project reveal" href="project3.html">
+                    <div class="thumb flow" aria-hidden="true">
+                        <svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" stroke="rgba(190,196,255,0.38)" stroke-width="1.5" stroke-linecap="round">
+                                <path d="M36 78 C130 70, 170 150, 250 148"/>
+                                <path d="M44 140 C140 128, 180 188, 258 196"/>
+                                <path d="M32 202 C130 210, 186 236, 262 246"/>
+                                <path d="M50 262 C148 258, 196 286, 268 292"/>
+                            </g>
+                            <g>
+                                <circle cx="62" cy="92" r="3" fill="#ff5c7a"/>
+                                <circle cx="108" cy="148" r="2.5" fill="#ff5c7a"/>
+                                <circle cx="84" cy="214" r="2.8" fill="#b388ff"/>
+                                <circle cx="132" cy="270" r="2.2" fill="#4da3ff"/>
+                                <circle cx="48" cy="164" r="2" fill="#4da3ff"/>
+                                <circle cx="156" cy="118" r="2.2" fill="#ff5c7a"/>
+                                <circle cx="188" cy="156" r="2.4" fill="#b388ff"/>
+                                <circle cx="214" cy="220" r="2" fill="#4da3ff"/>
+                                <circle cx="170" cy="286" r="2.3" fill="#34e39a"/>
+                            </g>
+                            <path d="M286 180 H352" stroke="url(#flowgrad)" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M340 170 L362 180 L340 190" fill="none" stroke="#b388ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="390" y="70" width="200" height="220" rx="18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)"/>
+                            <text x="490" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="168" font-weight="800" fill="#eef0ff">3</text>
+                            <defs>
+                                <linearGradient id="flowgrad" x1="286" y1="180" x2="362" y2="180" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#ff5c7a"/><stop offset="0.5" stop-color="#b388ff"/><stop offset="1" stop-color="#4da3ff"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="body">
+                        <span class="num">PROJECT 03</span>
+                        <h3>Fun with Flow Models</h3>
+                        <p>Generative modeling with flow matching: Euler sampling, classifier-free guidance, image editing, and a denoising UNet trained on MNIST.</p>
+                        <div class="tags"><span class="tag">Flow Matching</span><span class="tag">Euler Sampling</span><span class="tag">Guidance</span><span class="tag">UNet</span></div>
                         <span class="go">Read case study <span>→</span></span>
                     </div>
                 </a>
@@ -315,14 +360,15 @@
         <section id="skills">
             <div class="section-num">04</div>
             <h2>Skills Demonstrated</h2>
-            <p class="section-lede">Techniques implemented across both projects.</p>
+            <p class="section-lede">Techniques implemented across the three projects.</p>
             <div class="skills">
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><b>Image registration</b><p>Exhaustive and pyramid-based alignment with L2 and NCC scoring.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h4l3-8 4 16 3-8h2"/></svg></div><b>Signal processing</b><p>Convolution from scratch, Gaussian filters, and Fourier analysis.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21 21 3M3 12l9-9M12 21l9-9"/></svg></div><b>Edge detection</b><p>Finite differences, gradient magnitude, and derivative-of-Gaussian filters.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div><b>Image compositing</b><p>Hybrid images and seamless multiresolution blending.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16M6 16l4-4 3 3 5-6"/></svg></div><b>Performance tradeoffs</b><p>Choosing between accuracy and speed, e.g. NCC vs. L2 and loops vs. vectorization.</p></div>
-                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div><b>Python tooling</b><p>NumPy, SciPy, OpenCV, scikit-image, and Matplotlib.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14c2-6 4-8 8-8s6 4 8 8"/><path d="M4 10c2 6 4 8 8 8s6-4 8-8"/></svg></div><b>Generative models</b><p>Flow matching, Euler sampling, and classifier-free guidance.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div><b>Python tooling</b><p>NumPy, SciPy, OpenCV, scikit-image, Matplotlib, and PyTorch.</p></div>
             </div>
         </section>
     </main>
@@ -330,6 +376,7 @@
     <footer>
         <a href="project1.html">Project 1</a>
         <a href="project2.html">Project 2</a>
+        <a href="project3.html">Project 3</a>
         <a href="https://github.com/JessN777" target="_blank" rel="noopener">GitHub</a>
         <p style="margin-top: 12px;">© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</p>
     </footer>
