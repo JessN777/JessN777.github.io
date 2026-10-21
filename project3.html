@@ -236,15 +236,34 @@
 </div></section>
 </section>
 <section id="b-denoiser"><div class="part-header"><span class="kicker">PART B · 01</span><h2>Training a Single-Step Denoising UNet</h2></div>
-<section class="subsection" id="b-arch"><div class="sub-side"><div class="num">B 1.1</div><h3>Implementing the UNet</h3></div><div><div class="placeholder"><b>Fill in</b>How you built the UNet, and a figure of the architecture if you have one.</div></div></section>
-<section class="subsection" id="b-noise"><div class="sub-side"><div class="num">B 1.2</div><h3>Noising MNIST</h3></div><div><div class="placeholder"><b>Fill in</b>The noising grid at σ = 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0.</div></div></section>
-<section class="subsection" id="b-train"><div class="sub-side"><div class="num">B 1.2.1</div><h3>Training the Denoiser</h3></div><div><div class="placeholder"><b>Fill in</b>The loss curve, and test-set results at σ = 0.5 after epoch 1 and epoch 5.</div></div></section>
-<section class="subsection" id="b-ood"><div class="sub-side"><div class="num">B 1.2.2</div><h3>Out-of-Distribution Noise</h3></div><div><div class="placeholder"><b>Fill in</b>One test digit, denoised at each σ above, after training.</div></div></section>
-<section class="subsection" id="b-pure"><div class="sub-side"><div class="num">B 1.2.3</div><h3>Denoising Pure Noise</h3></div><div><div class="placeholder"><b>Fill in</b>The pure-noise loss curve, samples after epoch 1 and epoch 5, and what those outputs look like.</div></div></section>
+<section class="subsection" id="b-arch"><div class="sub-side"><div class="num">B 1.1</div><h3>Implementing the UNet</h3></div><div>
+<figure><div class="img-wrap"><img src="proj3/partb/atomic_ops_new.png" alt="Simple and composed UNet blocks"></div><figcaption><span class="fig">FIG B.1</span>The blocks to implement: Conv, DownConv, UpConv, Flatten, Unflatten, Concat, and the composed ConvBlock, DownBlock, and UpBlock.</figcaption></figure>
+<figure><div class="img-wrap"><img src="proj3/partb/unconditional_arch.png" alt="Unconditional UNet architecture"></div><figcaption><span class="fig">FIG B.2</span>Unconditional UNet. Solid arrows are layers. Dashed arrows are channel-wise skip concatenations.</figcaption></figure>
+<!-- FILL IN: one or two sentences on how you connected these blocks. -->
+</div></section>
+<section class="subsection" id="b-noise"><div class="sub-side"><div class="num">B 1.2</div><h3>Noising MNIST</h3></div><div><div class="placeholder"><b>Your figure goes here</b>Noising grid at σ = 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0.</div>
+<!-- FILL IN: replace this placeholder with <img src="proj3/partb/noise_grid.png"> and a caption. -->
+</div></section>
+<section class="subsection" id="b-train"><div class="sub-side"><div class="num">B 1.2.1</div><h3>Training the Denoiser</h3></div><div><div class="placeholder"><b>Your figures go here</b>Loss curve, and test-set results at σ = 0.5 after epoch 1 and epoch 5.</div>
+<!-- FILL IN: loss curve plus the epoch-1 and epoch-5 denoising grids, and a sentence on what improved. -->
+</div></section>
+<section class="subsection" id="b-ood"><div class="sub-side"><div class="num">B 1.2.2</div><h3>Out-of-Distribution Noise</h3></div><div><div class="placeholder"><b>Your figure goes here</b>One test digit, denoised at each σ above, after training.</div>
+<!-- FILL IN: the sigma sweep on one held-out digit, and a sentence on where it breaks. -->
+</div></section>
+<section class="subsection" id="b-pure"><div class="sub-side"><div class="num">B 1.2.3</div><h3>Denoising Pure Noise</h3></div><div><div class="placeholder"><b>Your figures go here</b>Pure-noise loss curve, samples after epoch 1 and epoch 5, and what those outputs look like.</div>
+<!-- FILL IN: loss curve, epoch-1 and epoch-5 samples, and why an MSE model produces that pattern. -->
+</div></section>
 </section>
 <section id="b-flow"><div class="part-header"><span class="kicker">PART B · 02</span><h2>Training a Flow Matching Model</h2></div>
-<section class="subsection" id="b-time"><div class="sub-side"><div class="num">B 2.1–2.3</div><h3>Time-Conditioned Flow Matching</h3></div><div><div class="placeholder"><b>Fill in</b>How you inject t, the training-loss curve, and samples after epochs 1, 5, and 10.</div></div></section>
-<section class="subsection" id="b-class"><div class="sub-side"><div class="num">B 2.4–2.6</div><h3>Class-Conditioned Flow Matching</h3></div><div><div class="placeholder"><b>Fill in</b>The loss curve, four samples of each digit after epochs 1, 5, and 10, and what you changed when you removed the learning-rate scheduler.</div></div></section>
+<section class="subsection" id="b-time"><div class="sub-side"><div class="num">B 2.1–2.3</div><h3>Time-Conditioned Flow Matching</h3></div><div>
+<figure><div class="img-wrap"><img src="proj3/partb/fc_long.png" alt="FCBlock of two linear layers with a GELU"></div><figcaption><span class="fig">FIG B.3</span>FCBlock used to inject the timestep. For a scalar t, the first linear layer has one input.</figcaption></figure>
+<figure><div class="img-wrap"><img src="proj3/partb/conditional_arch_fm.png" alt="UNet with time conditioning drawn in red"></div><figcaption><span class="fig">FIG B.4</span>Where t enters the UNet. Dotted arrows are the conditioning signal.</figcaption></figure>
+<div class="placeholder"><b>Your figures go here</b>Training-loss curve, and samples after epochs 1, 5, and 10.</div>
+<!-- FILL IN: the time-conditioned loss curve and the epoch 1, 5, and 10 sample grids. -->
+</div></section>
+<section class="subsection" id="b-class"><div class="sub-side"><div class="num">B 2.4–2.6</div><h3>Class-Conditioned Flow Matching</h3></div><div><div class="placeholder"><b>Your figures go here</b>Loss curve, four samples of each digit after epochs 1, 5, and 10, and what you changed when you removed the learning-rate scheduler.</div>
+<!-- FILL IN: class-conditioned loss curve, the 4-per-digit grids, the no-scheduler grid, and what you changed to replace the scheduler. -->
+</div></section>
 </section>
 <section class="learned" id="learned"><div class="kicker">REFLECTION</div><h2>What I Learned</h2><p class="prose"><em>Fill in after both parts: what changed between one-step and iterative denoising, what guidance did, and what happened when you trained the MNIST models.</em></p></section><div class="next"><a href="project2.html"><small>← PREVIOUS</small><b>Project 2: Filters &amp; Frequencies</b></a><a href="index.html"><small>BACK TO →</small><b>All Projects</b></a></div><p style="margin-top:32px;color:var(--muted)">Assignment: <a href="https://cal-cs180.github.io/fa26/hw/proj3-flow/parta.html">Part A</a> · <a href="https://cal-cs180.github.io/fa26/hw/proj3-flow/partb.html">Part B</a></p></main><footer>© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</footer><script>
 const links=[...document.querySelectorAll('#toc a')];function scroll(){const h=document.documentElement;document.getElementById('progress').style.width=100*h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)+'%';let id='';document.querySelectorAll('main>section[id]').forEach(s=>{if(s.getBoundingClientRect().top<160)id=s.id});links.forEach(a=>a.classList.toggle('active',a.hash==='#'+id))}window.addEventListener('scroll',scroll,{passive:true});scroll();</script></body></html>
