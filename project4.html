@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Warping and Mosaicing | Jessica Nguyen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+        :root {
+            --bg: #07091a;
+            --surface: rgba(255,255,255,0.045);
+            --text: #eef0ff;
+            --body: #c9cce6;
+            --muted: #9aa1c7;
+            --border: rgba(255,255,255,0.09);
+            --accent: #8b93ff;
+            --accent-soft: rgba(139,147,255,0.14);
+            --green: #34e39a;
+            --red: #ff5c7a;
+            --blue: #4da3ff;
+            --grad: linear-gradient(90deg, #ff5c7a, #b388ff 40%, #4da3ff 70%, #34e39a);
+            --shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background:
+                radial-gradient(600px 400px at 5% 10%, rgba(255,92,122,0.09), transparent 70%),
+                radial-gradient(700px 500px at 95% 35%, rgba(77,163,255,0.09), transparent 70%),
+                radial-gradient(600px 500px at 30% 95%, rgba(52,227,154,0.06), transparent 70%);
+        }
+        a { color: var(--accent); text-decoration: none; }
+
+        .progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--grad); z-index: 30; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 20;
+            background: rgba(7,9,26,0.72); backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner {
+            max-width: 1160px; margin: 0 auto; padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+        }
+        .brand { font-weight: 700; color: var(--text); }
+        .toc { display: flex; gap: 4px; font-size: 13px; flex-wrap: wrap; }
+        .toc a {
+            color: var(--muted); font-weight: 500; padding: 5px 10px; border-radius: 999px;
+            font-family: 'JetBrains Mono', monospace; transition: background 0.2s, color 0.2s;
+        }
+        .toc a:hover { color: var(--text); }
+        .toc a.active { background: var(--accent-soft); color: #fff; }
+
+        .hero { max-width: 1160px; margin: 0 auto; padding: 90px 24px 40px; }
+        .eyebrow {
+            display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em;
+            max-width: 900px;
+        }
+        .hero h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .lede { font-size: 1.2rem; color: var(--body); max-width: 720px; margin-top: 22px; }
+        .meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; font-size: 14px; color: var(--muted); }
+        .meta b { color: var(--text); font-weight: 600; margin-right: 6px; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+        .tag { font-size: 12.5px; font-weight: 500; padding: 5px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+
+        .hero-figure { max-width: 1160px; margin: 20px auto 0; padding: 0 24px; }
+        .hero-figure .frame {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .hero-figure .cell {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .hero-figure .cell img { width: 100%; height: 260px; object-fit: cover; display: block; background: #fff; cursor: zoom-in; }
+        .hero-figure .cell span { display: block; padding: 12px 16px; font-size: 13px; color: var(--muted); }
+        .hero-figure .cell span b { color: var(--text); font-weight: 600; }
+
+        .overview { max-width: 1160px; margin: 60px auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .ov {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+            color: inherit; transition: border-color 0.25s, transform 0.25s;
+        }
+        .ov:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .ov .n { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+        .ov b { display: block; font-size: 15px; margin: 2px 0 4px; }
+        .ov p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+        main { max-width: 1160px; margin: 0 auto; padding: 0 24px 80px; }
+        .part-header { padding-top: 110px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 10px; }
+        .part-header .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .part-header h2 {
+            font-size: 2.3rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(90deg, #fff, #c9ccff); -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        .subsection { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding-top: 70px; }
+        .sub-side { position: sticky; top: 90px; align-self: start; }
+        .sub-side .num { font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 500; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sub-side h3 { font-size: 1.25rem; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+        .sub-side .keys { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .sub-side .key { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: baseline; }
+        .sub-side .key::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transform: translateY(-2px); }
+
+        .prose { color: var(--body); font-size: 16.5px; max-width: 780px; }
+        .prose p + p { margin-top: 14px; }
+
+        figure {
+            margin-top: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; box-shadow: var(--shadow);
+        }
+        figure .img-wrap { background: #fff; padding: 14px; }
+        figure img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+        figure.narrow .img-wrap { display: flex; justify-content: center; }
+        figure.narrow img { max-width: 620px; }
+        figcaption { padding: 14px 18px; font-size: 14px; color: var(--muted); display: flex; gap: 12px; align-items: baseline; }
+        figcaption .fig { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); white-space: nowrap; }
+
+        .callout {
+            margin-top: 24px; padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(139,147,255,0.3);
+            background: var(--accent-soft); color: var(--body); font-size: 15px;
+        }
+        .callout b { color: #fff; }
+        .callout code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: #fff; }
+
+        .learned {
+            margin-top: 110px; border-radius: 20px; padding: 44px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,92,122,0.12), rgba(139,92,255,0.12) 50%, rgba(77,163,255,0.12));
+            border: 1px solid var(--border);
+        }
+        .learned .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+        .learned h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+        .learned .prose { max-width: 860px; }
+
+        .next { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 60px; }
+        .next a {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; color: var(--text);
+            transition: border-color 0.25s, transform 0.25s;
+        }
+        .next a:hover { border-color: rgba(139,147,255,0.5); transform: translateY(-3px); }
+        .next small { display: block; color: var(--muted); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+        .next b { font-size: 16px; }
+        .next a:last-child { text-align: right; }
+
+        footer { border-top: 1px solid var(--border); padding: 30px 24px; text-align: center; color: var(--muted); font-size: 14px; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(5,6,18,0.92); display: none; z-index: 50;
+            align-items: center; justify-content: center; padding: 30px; cursor: zoom-out; flex-direction: column; gap: 14px;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 8px; background: #fff; }
+        .lightbox p { color: var(--muted); font-size: 14px; text-align: center; max-width: 800px; }
+
+        @media (max-width: 900px) {
+            .subsection { grid-template-columns: 1fr; gap: 18px; }
+            .sub-side { position: static; }
+            .overview { grid-template-columns: repeat(2, 1fr); }
+            .hero-figure .frame { grid-template-columns: 1fr 1fr; }
+            .hero-figure .cell:last-child { display: none; }
+            .toc { display: none; }
+        }
+        @media (max-width: 560px) {
+            .hero, main, .overview, .hero-figure, .topbar-inner { padding-left: 16px; padding-right: 16px; }
+            .hero { padding-top: 60px; }
+            .hero-figure .frame, .overview, .next { grid-template-columns: 1fr; }
+            .hero-figure .cell:last-child { display: block; }
+            .learned { padding: 26px; }
+            .next a:last-child { text-align: left; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+        }
+    
+
+.subsection>div:last-child{min-width:0}.prose{max-width:none}
+.draft-note{margin-top:26px;padding:18px 22px;border:1px solid rgba(245,193,103,.35);border-radius:14px;background:rgba(245,193,103,.06);color:var(--body);font-size:14px}.draft-note b{color:#f5c167}
+.answer-block{margin-top:24px;padding:22px;border:1px dashed rgba(245,193,103,.55);border-left:3px solid #f5c167;border-radius:12px;background:rgba(245,193,103,.045)}
+.answer-label{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#f5c167;margin-bottom:10px}.answer-block h4{font-size:16px;color:var(--text);margin-bottom:8px}.answer-block .prompt{font-size:14px;color:var(--body)}.answer{margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,193,103,.16);color:var(--muted);font-size:15px}.answer-code{margin-top:14px;white-space:pre-wrap}
+.image-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}.image-grid figure{margin-top:0}.image-grid .wide{grid-column:1/-1}
+.media-slot{position:relative;background:#0b0e24;min-height:180px;display:grid;place-items:center;padding:14px}.media-slot img{max-height:650px;object-fit:contain}.media-slot img[hidden]{display:none}.media-slot .missing{display:none}.media-slot.empty .missing{display:flex}.media-slot.empty{min-height:210px;background:linear-gradient(135deg,rgba(139,147,255,.06),rgba(77,163,255,.025))}
+.missing{align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:10px;padding:20px;color:var(--muted);font-size:13px}.missing svg{width:32px;height:32px;color:var(--accent);opacity:.7}.missing b{color:var(--body);font-size:14px}.missing code{overflow-wrap:anywhere;font:11px/1.6 'JetBrains Mono',monospace;max-width:100%}
+figcaption{display:block}.fig{display:block;margin-bottom:5px}.asset-path{display:block;font:10px/1.7 'JetBrains Mono',monospace;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}
+.table-scroll{overflow-x:auto;margin-top:24px;border:1px solid var(--border);border-radius:12px}table{width:100%;border-collapse:collapse;font-size:13px;min-width:540px}th,td{padding:14px;text-align:left;border-bottom:1px solid var(--border)}th{background:var(--surface);color:var(--body);font-weight:500}td{color:var(--muted)}tr:last-child td{border-bottom:0}.pending{color:#f5c167}
+pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;background:#0b0e24;border-radius:10px;color:var(--body)}.resource-links{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:22px;font-size:14px}
+.hero-art{max-width:1160px;margin:12px auto 0;padding:0 24px}.hero-art svg{width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:18px;background:var(--surface)}
+.skip-link{position:fixed;left:12px;top:-80px;z-index:100;padding:8px 15px;background:var(--accent);color:var(--bg);border-radius:8px}.skip-link:focus{top:12px}a:focus-visible,button:focus-visible{outline:2px solid var(--green);outline-offset:4px}
+.reveal{opacity:1;transform:none}.lightbox{cursor:default}.lightbox button{align-self:flex-end;background:var(--surface);color:white;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}.lightbox img{object-fit:contain}
+@media(max-width:560px){.image-grid{grid-template-columns:1fr}.hero-art{padding:0 16px}.answer-block{padding:18px}.hero-art text{font-size:14px}.media-slot.empty{min-height:180px}}
+@media print{.topbar,.progress,.next,.lightbox,.hero-art{display:none}.sub-side{position:static}.answer-block{break-inside:avoid}}
+</style></head>
+<body><a class="skip-link" href="#capture">Skip to project content</a><div class="progress" id="progress" aria-hidden="true"></div>
+<nav class="topbar" aria-label="Project navigation"><div class="topbar-inner"><a class="brand" href="index.html">← Jessica Nguyen</a><div class="toc" id="toc"><a href="#capture">A.1</a><a href="#homographies">A.2</a><a href="#warping">A.3</a><a href="#mosaics">A.4</a><a href="#extension">A.5</a></div></div></nav>
+<header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 4A</span><h1>Image Warping<br>and <span class="grad">Mosaicing</span></h1><p class="lede">From overlapping photographs to rectified views and panoramic mosaics.</p><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span></div><div class="tags"><span class="tag">Homographies</span><span class="tag">Least Squares</span><span class="tag">Inverse Warping</span><span class="tag">Interpolation</span><span class="tag">Image Blending</span></div><div class="draft-note"><b>Report template · ready for your work</b><br>Every gold <strong>YOUR ANSWER</strong> box marks a response for you to write. Image cards show the filenames to add later. Replace the bracketed text in <code>project4.html</code>; this page does not save typed answers.</div></header>
+<div class="hero-art"><svg viewBox="0 0 1100 230" role="img" aria-label="Illustration of two overlapping image planes registered into one panorama; not a project result"><defs><linearGradient id="plane" x2="1" y2="1"><stop stop-color="#ff5c7a" stop-opacity=".2"/><stop offset=".5" stop-color="#8b93ff" stop-opacity=".18"/><stop offset="1" stop-color="#4da3ff" stop-opacity=".2"/></linearGradient><pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke="#8b93ff" stroke-opacity=".14"/></pattern></defs><rect width="1100" height="230" fill="url(#grid)"/><g fill="url(#plane)" stroke-width="1.5"><path d="M80 51 303 69 284 170 62 154Z" stroke="#ff8aa0"/><path d="M209 65 432 47 450 153 227 173Z" stroke="#8bb9ff"/><rect x="639" y="51" width="367" height="122" rx="6" stroke="#8b93ff"/></g><g fill="#8b93ff"><circle cx="250" cy="91" r="4"/><circle cx="276" cy="143" r="4"/><circle cx="333" cy="95" r="4"/><circle cx="357" cy="141" r="4"/></g><path d="M485 112h95m-13-12 13 12-13 12" fill="none" stroke="#9aa1c7" stroke-width="2"/><g font-family="Inter,Segoe UI,sans-serif" font-size="13" fill="#9aa1c7" text-anchor="middle"><text x="255" y="207">OVERLAPPING VIEWS</text><text x="533" y="91">H</text><text x="822" y="207">A COMMON PROJECTION</text></g></svg></div>
+<div class="overview"><a class="ov" href="#capture"><span class="n">A.1</span><b>Capture</b><p>Source views and capture notes.</p></a><a class="ov" href="#homographies"><span class="n">A.2</span><b>Recover Geometry</b><p>Correspondences, equations, matrices.</p></a><a class="ov" href="#warping"><span class="n">A.3</span><b>Warp &amp; Rectify</b><p>Two methods, two rectifications.</p></a><a class="ov" href="#mosaics"><span class="n">A.4</span><b>Blend Mosaics</b><p>Three mosaics and your analysis.</p></a></div>
+<main><section id="capture"><div class="part-header"><span class="kicker">PART A · 01</span><h2>Shoot and Digitize Pictures</h2></div><section class="subsection" id="a1"><div class="sub-side"><div class="num">A.1</div><h3>Source Photographs</h3><div class="keys"><span class="key">Fixed camera center</span><span class="key">Overlapping image sets</span></div></div><div><div class="answer-block" id="answer-a1-setup">
+  <div class="answer-label">YOUR ANSWER · A1-SETUP</div>
+  <h4>How did you capture your image sets?</h4><p class="prompt">Describe the scenes, camera or phone, and how you kept the center of projection fixed while rotating. State the overlap and any resizing. Identify which photos you took and credit any other sources.</p>
+  <!-- YOUR ANSWER a1-setup: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic1_left.jpg" alt="Set 1 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.1a</span>Set 1 · source photograph<span class="asset-path">proj4/images/mosaic1_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic1_right.jpg" alt="Set 1 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.1b</span>Set 1 · reference photograph<span class="asset-path">proj4/images/mosaic1_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set1">
+  <div class="answer-label">YOUR ANSWER · A1-SET1</div>
+  <h4>Image set 1: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
+  <!-- YOUR ANSWER a1-set1: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic2_left.jpg" alt="Set 2 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.2a</span>Set 2 · source photograph<span class="asset-path">proj4/images/mosaic2_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic2_right.jpg" alt="Set 2 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.2b</span>Set 2 · reference photograph<span class="asset-path">proj4/images/mosaic2_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set2">
+  <div class="answer-label">YOUR ANSWER · A1-SET2</div>
+  <h4>Image set 2: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
+  <!-- YOUR ANSWER a1-set2: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic3_left.jpg" alt="Set 3 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.3a</span>Set 3 · source photograph<span class="asset-path">proj4/images/mosaic3_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic3_right.jpg" alt="Set 3 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A1.3b</span>Set 3 · reference photograph<span class="asset-path">proj4/images/mosaic3_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set3">
+  <div class="answer-label">YOUR ANSWER · A1-SET3</div>
+  <h4>Image set 3: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
+  <!-- YOUR ANSWER a1-set3: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div></div></section></section><section id="homographies"><div class="part-header"><span class="kicker">PART A · 02</span><h2>Recover Homographies</h2></div><section class="subsection" id="a2"><div class="sub-side"><div class="num">A.2</div><h3>Point Matches &amp; Geometry</h3><div class="keys"><span class="key">computeH(im1_pts, im2_pts)</span><span class="key">Least-squares recovery</span></div></div><div><div class="answer-block" id="answer-a2-matches">
+  <div class="answer-label">YOUR ANSWER · A2-MATCHES</div>
+  <h4>How did you choose correspondences?</h4><p class="prompt">Describe your point-selection tool, the number of matches per pair, and how you distributed distinctive points across the overlap. Explain why more than four correspondences help.</p>
+  <!-- YOUR ANSWER a2-matches: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="answer-block" id="answer-a2-system">
+  <div class="answer-label">YOUR ANSWER · A2-SYSTEM</div>
+  <h4>Set up your system of equations</h4><p class="prompt">Show the two equations contributed by one (x, y) ↔ (u, v) match, define the eight unknowns, and write the stacked Ah = b system. Explain how you solved the overdetermined system and any normalization used.</p>
+  <!-- YOUR ANSWER a2-system: replace the placeholder below with your own response. -->
+  <pre class="answer answer-code">[Write your answer here.]</pre>
+</div><figure><div class="media-slot">
+  <img src="proj4/results/mosaic1_points.png" alt="Mosaic 1 · numbered matching points in both images" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic1_points.png</code></div>
+  </div><figcaption><span class="fig">FIG A2.1</span>Mosaic 1 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic1_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h1">
+  <div class="answer-label">YOUR ANSWER · A2-H1</div>
+  <h4>Mosaic 1: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
+  <!-- YOUR ANSWER a2-h1: replace the placeholder below with your own response. -->
+  <pre class="answer answer-code">[Write your answer here.]</pre>
+</div><figure><div class="media-slot">
+  <img src="proj4/results/mosaic2_points.png" alt="Mosaic 2 · numbered matching points in both images" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic2_points.png</code></div>
+  </div><figcaption><span class="fig">FIG A2.2</span>Mosaic 2 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic2_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h2">
+  <div class="answer-label">YOUR ANSWER · A2-H2</div>
+  <h4>Mosaic 2: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
+  <!-- YOUR ANSWER a2-h2: replace the placeholder below with your own response. -->
+  <pre class="answer answer-code">[Write your answer here.]</pre>
+</div><figure><div class="media-slot">
+  <img src="proj4/results/mosaic3_points.png" alt="Mosaic 3 · numbered matching points in both images" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic3_points.png</code></div>
+  </div><figcaption><span class="fig">FIG A2.3</span>Mosaic 3 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic3_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h3">
+  <div class="answer-label">YOUR ANSWER · A2-H3</div>
+  <h4>Mosaic 3: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
+  <!-- YOUR ANSWER a2-h3: replace the placeholder below with your own response. -->
+  <pre class="answer answer-code">[Write your answer here.]</pre>
+</div></div></section></section><section id="warping"><div class="part-header"><span class="kicker">PART A · 03</span><h2>Warp and Rectify Images</h2></div><section class="subsection" id="a3"><div class="sub-side"><div class="num">A.3</div><h3>Inverse Warping</h3><div class="keys"><span class="key">Two rectifications</span><span class="key">Two interpolation methods</span></div></div><div><div class="answer-block" id="answer-a3-warp">
+  <div class="answer-label">YOUR ANSWER · A3-WARP</div>
+  <h4>How does your inverse warp work?</h4><p class="prompt">Explain how you find output bounds from transformed corners, handle the canvas offset, map output pixels back to the input, and mask invalid samples. State your convention for pixel centers.</p>
+  <!-- YOUR ANSWER a3-warp: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="answer-block" id="answer-a3-interpolation">
+  <div class="answer-label">YOUR ANSWER · A3-INTERPOLATION</div>
+  <h4>How did you implement both interpolation methods?</h4><p class="prompt">Describe nearest neighbor and derive the four bilinear weights from the fractional source coordinates. Explain your treatment of border pixels. Refer to warpImageNearestNeighbor(im, H) and warpImageBilinear(im, H).</p>
+  <!-- YOUR ANSWER a3-interpolation: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/rectification1.jpg" alt="Rectification 1 · original photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/rectification1.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A3.1a</span>Rectification 1 · original photograph<span class="asset-path">proj4/images/rectification1.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification1_points.png" alt="Rectification 1 · source corners and destination rectangle" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification1_points.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.1b</span>Rectification 1 · source corners and destination rectangle<span class="asset-path">proj4/results/rectification1_points.png</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification1_nearest.png" alt="Rectification 1 · nearest neighbor" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification1_nearest.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.1c</span>Rectification 1 · nearest neighbor<span class="asset-path">proj4/results/rectification1_nearest.png</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification1_bilinear.png" alt="Rectification 1 · bilinear" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification1_bilinear.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.1d</span>Rectification 1 · bilinear<span class="asset-path">proj4/results/rectification1_bilinear.png</span></figcaption></figure></div><div class="answer-block" id="answer-a3-rect1">
+  <div class="answer-label">YOUR ANSWER · A3-RECT1</div>
+  <h4>Rectification 1: geometry and result</h4><p class="prompt">Identify the planar rectangular object. Give your source and destination coordinates, explain the known aspect ratio, and describe whether lines and proportions look correct. Compare nearest neighbor and bilinear detail in this example.</p>
+  <!-- YOUR ANSWER a3-rect1: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/rectification2.jpg" alt="Rectification 2 · original photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/rectification2.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A3.2a</span>Rectification 2 · original photograph<span class="asset-path">proj4/images/rectification2.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification2_points.png" alt="Rectification 2 · source corners and destination rectangle" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification2_points.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.2b</span>Rectification 2 · source corners and destination rectangle<span class="asset-path">proj4/results/rectification2_points.png</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification2_nearest.png" alt="Rectification 2 · nearest neighbor" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification2_nearest.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.2c</span>Rectification 2 · nearest neighbor<span class="asset-path">proj4/results/rectification2_nearest.png</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/results/rectification2_bilinear.png" alt="Rectification 2 · bilinear" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification2_bilinear.png</code></div>
+  </div><figcaption><span class="fig">FIG A3.2d</span>Rectification 2 · bilinear<span class="asset-path">proj4/results/rectification2_bilinear.png</span></figcaption></figure></div><div class="answer-block" id="answer-a3-rect2">
+  <div class="answer-label">YOUR ANSWER · A3-RECT2</div>
+  <h4>Rectification 2: geometry and result</h4><p class="prompt">Identify the planar rectangular object. Give your source and destination coordinates, explain the known aspect ratio, and describe whether lines and proportions look correct. Compare nearest neighbor and bilinear detail in this example.</p>
+  <!-- YOUR ANSWER a3-rect2: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="table-scroll"><table><caption style="text-align:left;padding:14px;color:var(--body)">YOUR MEASUREMENTS · replace every pending cell</caption><thead><tr><th scope="col">Example</th><th scope="col">Output size (px)</th><th scope="col">Nearest neighbor (s)</th><th scope="col">Bilinear (s)</th></tr></thead><tbody><tr><th scope="row">Rectification 1</th><td class="pending">[Add size]</td><td class="pending">[Add time]</td><td class="pending">[Add time]</td></tr><tr><th scope="row">Rectification 2</th><td class="pending">[Add size]</td><td class="pending">[Add time]</td><td class="pending">[Add time]</td></tr></tbody></table></div><div class="answer-block" id="answer-a3-comparison">
+  <div class="answer-label">YOUR ANSWER · A3-COMPARISON</div>
+  <h4>What are the speed and quality trade-offs?</h4><p class="prompt">Use your measured runtimes and actual results. Compare jagged edges, smoothness, and blur; explain when you would choose each interpolation method. State the image sizes and what your timing includes.</p>
+  <!-- YOUR ANSWER a3-comparison: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div></div></section></section><section id="mosaics"><div class="part-header"><span class="kicker">PART A · 04</span><h2>Blend Images into a Mosaic</h2></div><section class="subsection" id="a4"><div class="sub-side"><div class="num">A.4</div><h3>Image Mosaics</h3><div class="keys"><span class="key">Three source pairs</span><span class="key">Weighted blending</span></div></div><div><div class="answer-block" id="answer-a4-procedure">
+  <div class="answer-label">YOUR ANSWER · A4-PROCEDURE</div>
+  <h4>How did you build and blend the mosaics?</h4><p class="prompt">Explain your choice of reference, shared output canvas, transformation of each source, alpha or feathering weights, and weighted-average formula. Explain how you handle non-overlap and avoid hard overwrite seams.</p>
+  <!-- YOUR ANSWER a4-procedure: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic1_left.jpg" alt="Mosaic 1 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.1a</span>Mosaic 1 · source photograph<span class="asset-path">proj4/images/mosaic1_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic1_right.jpg" alt="Mosaic 1 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.1b</span>Mosaic 1 · reference photograph<span class="asset-path">proj4/images/mosaic1_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
+  <img src="proj4/results/mosaic1_mosaic.png" alt="Mosaic 1 · blended result" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic1_mosaic.png</code></div>
+  </div><figcaption><span class="fig">FIG A4.1c</span>Mosaic 1 · blended result<span class="asset-path">proj4/results/mosaic1_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic1">
+  <div class="answer-label">YOUR ANSWER · A4-MOSAIC1</div>
+  <h4>Mosaic 1: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
+  <!-- YOUR ANSWER a4-mosaic1: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic2_left.jpg" alt="Mosaic 2 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.2a</span>Mosaic 2 · source photograph<span class="asset-path">proj4/images/mosaic2_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic2_right.jpg" alt="Mosaic 2 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.2b</span>Mosaic 2 · reference photograph<span class="asset-path">proj4/images/mosaic2_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
+  <img src="proj4/results/mosaic2_mosaic.png" alt="Mosaic 2 · blended result" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic2_mosaic.png</code></div>
+  </div><figcaption><span class="fig">FIG A4.2c</span>Mosaic 2 · blended result<span class="asset-path">proj4/results/mosaic2_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic2">
+  <div class="answer-label">YOUR ANSWER · A4-MOSAIC2</div>
+  <h4>Mosaic 2: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
+  <!-- YOUR ANSWER a4-mosaic2: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><div class="image-grid"><figure><div class="media-slot">
+  <img src="proj4/images/mosaic3_left.jpg" alt="Mosaic 3 · source photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_left.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.3a</span>Mosaic 3 · source photograph<span class="asset-path">proj4/images/mosaic3_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  <img src="proj4/images/mosaic3_right.jpg" alt="Mosaic 3 · reference photograph" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_right.jpg</code></div>
+  </div><figcaption><span class="fig">FIG A4.3b</span>Mosaic 3 · reference photograph<span class="asset-path">proj4/images/mosaic3_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
+  <img src="proj4/results/mosaic3_mosaic.png" alt="Mosaic 3 · blended result" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic3_mosaic.png</code></div>
+  </div><figcaption><span class="fig">FIG A4.3c</span>Mosaic 3 · blended result<span class="asset-path">proj4/results/mosaic3_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic3">
+  <div class="answer-label">YOUR ANSWER · A4-MOSAIC3</div>
+  <h4>Mosaic 3: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
+  <!-- YOUR ANSWER a4-mosaic3: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div></div></section></section><section id="extension"><div class="part-header"><span class="kicker">PART A · 05</span><h2>Bells and Whistles</h2></div><section class="subsection" id="a5"><div class="sub-side"><div class="num">A.5</div><h3>Extension</h3><div class="keys"><span class="key">CS280A requirement</span></div></div><div><p class="prose">Required for CS280A; optional for CS180. Complete this section if you implement an extension.</p><div class="answer-block" id="answer-a5-extension">
+  <div class="answer-label">YOUR ANSWER · A5-EXTENSION</div>
+  <h4>Did you implement an extension?</h4><p class="prompt">If applicable, explain your spherical, cylindrical, polar, or other extension, its parameters, and how you sample from the original images. Add your result below and compare it with the planar mosaic. Otherwise state that you did not complete an extension.</p>
+  <!-- YOUR ANSWER a5-extension: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div><figure><div class="media-slot">
+  <img src="proj4/results/extension.png" alt="Extension result · add if applicable" loading="lazy">
+  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/extension.png</code></div>
+  </div><figcaption><span class="fig">FIG A5.1</span>Extension result · add if applicable<span class="asset-path">proj4/results/extension.png</span></figcaption></figure></div></section></section>
+<section class="learned" id="learned"><div class="kicker">REFLECTION</div><h2>What I Learned</h2><div class="answer-block" id="answer-reflection">
+  <div class="answer-label">YOUR ANSWER · REFLECTION</div>
+  <h4>What did you learn from this project?</h4><p class="prompt">Reflect on homography estimation, choosing good point matches, interpolation, and blending. Describe a challenge you encountered and what changed your understanding.</p>
+  <!-- YOUR ANSWER reflection: replace the placeholder below with your own response. -->
+  <p class="answer">[Write your answer here.]</p>
+</div></section>
+<div class="resource-links"><a href="proj4/README.md">Where to add answers and images</a><a href="proj4/mosaic.py">Python implementation</a><a href="proj4/requirements.txt">Python requirements</a></div>
+<div class="next"><a href="project3.html"><small>← PREVIOUS</small><b>Project 3: Fun with Flow Models</b></a><a href="index.html#projects"><small>BACK TO →</small><b>All Projects</b></a></div></main>
+<footer>© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</footer>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded project image" tabindex="-1"><button type="button" id="close-lightbox">Close ×</button><img alt=""><p></p></div>
+<script>
+document.querySelectorAll('.media-slot img').forEach(img=>{
+  const missing=()=>{img.hidden=true;img.parentElement.classList.add('empty');};
+  img.addEventListener('error',missing);
+  img.addEventListener('load',()=>{img.hidden=false;img.parentElement.classList.remove('empty');});
+  if(img.complete && !img.naturalWidth) missing();
+});
+const tocLinks=[...document.querySelectorAll('#toc a')];
+function updateScroll(){const h=document.documentElement;document.getElementById('progress').style.width=100*h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)+'%';let id='';document.querySelectorAll('main>section[id]').forEach(s=>{if(s.getBoundingClientRect().top<170)id=s.id;});tocLinks.forEach(a=>{a.classList.toggle('active',a.hash==='#'+id);if(a.hash==='#'+id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});}
+window.addEventListener('scroll',updateScroll,{passive:true});updateScroll();
+const lightbox=document.getElementById('lightbox'), closeButton=document.getElementById('close-lightbox');let lastFocus;
+function closeImage(){lightbox.classList.remove('open');document.body.style.overflow='';if(lastFocus)lastFocus.focus();}
+document.querySelectorAll('.media-slot img').forEach(img=>{img.tabIndex=0;img.setAttribute('role','button');const open=()=>{if(!img.naturalWidth)return;lastFocus=img;lightbox.querySelector('img').src=img.src;lightbox.querySelector('img').alt=img.alt;lightbox.querySelector('p').textContent=img.alt;lightbox.classList.add('open');document.body.style.overflow='hidden';closeButton.focus();};img.addEventListener('click',open);img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});});
+closeButton.addEventListener('click',closeImage);lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeImage();});lightbox.addEventListener('keydown',e=>{if(e.key==='Escape')closeImage();if(e.key==='Tab'){e.preventDefault();closeButton.focus();}});
+</script></body></html>
