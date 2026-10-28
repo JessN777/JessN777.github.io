@@ -238,7 +238,7 @@
                 <span class="layer g" aria-hidden="true">Jessica Nguyen</span>
                 <span class="layer r" aria-hidden="true">Jessica Nguyen</span>
             </h1>
-            <p class="sub">Computer vision projects: reconstructing historical color photographs, building filters from scratch, blending images across frequencies, and generating images with flow models.</p>
+            <p class="sub">Computer vision projects: reconstructing historical color photographs, building filters from scratch, blending images across frequencies, generating images with flow models, and stitching panoramic mosaics.</p>
             <p class="hint">↑ the R, G and B channels just aligned themselves, like in Project 1</p>
             <div class="cta">
                 <a class="btn primary" href="#projects">View projects</a>
@@ -249,7 +249,7 @@
 
     <main>
         <div class="stats reveal">
-            <div class="stat"><div class="num" data-count="3">0</div><div class="lbl">projects completed</div></div>
+            <div class="stat"><div class="num" data-count="4">0</div><div class="lbl">projects completed</div></div>
             <div class="stat"><div class="num" data-count="17">0</div><div class="lbl">historical photos restored</div></div>
             <div class="stat"><div class="num" data-count="7">0</div><div class="lbl">filtering techniques built</div></div>
             <div class="stat"><div class="num" data-count="175" data-suffix=" px">0</div><div class="lbl">largest shift recovered</div></div>
@@ -324,9 +324,9 @@
                         <svg viewBox="0 0 520 260" role="img" aria-label="Overlapping image planes for Project 4"><defs><linearGradient id="mosaic-plane"><stop stop-color="#ff5c7a" stop-opacity=".32"/><stop offset="1" stop-color="#4da3ff" stop-opacity=".32"/></linearGradient></defs><g fill="url(#mosaic-plane)" stroke-width="2"><path d="M65 65 270 85 250 207 48 184Z" stroke="#ff8aa0"/><path d="M235 83 443 53 467 180 254 210Z" stroke="#8bb9ff"/></g><g fill="#b388ff"><circle cx="252" cy="105" r="5"/><circle cx="240" cy="178" r="5"/><circle cx="320" cy="104" r="5"/><circle cx="335" cy="172" r="5"/></g></svg>
                     </div>
                     <div class="body">
-                        <span class="num">PROJECT 04 · IN PROGRESS</span>
+                        <span class="num">PROJECT 04 · RESULTS</span>
                         <h3>Image Warping and Mosaicing</h3>
-                        <p>Projective geometry, image rectification, and panoramic mosaics. Report template with spaces for my photographs, results, and explanations.</p>
+                        <p>Homography recovery, window rectification, three pairwise mosaics, and a cylindrical panorama with direct inverse sampling and focal-length comparisons.</p>
                         <div class="tags"><span class="tag">Homographies</span><span class="tag">Inverse Warping</span><span class="tag">Interpolation</span><span class="tag">Blending</span></div>
                         <span class="go">View project <span>→</span></span>
                     </div>
@@ -372,7 +372,7 @@
         <section id="skills">
             <div class="section-num">04</div>
             <h2>Skills Demonstrated</h2>
-            <p class="section-lede">Techniques implemented across the three projects.</p>
+            <p class="section-lede">Techniques implemented across the four projects.</p>
             <div class="skills">
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><b>Image registration</b><p>Exhaustive and pyramid-based alignment with L2 and NCC scoring.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h4l3-8 4 16 3-8h2"/></svg></div><b>Signal processing</b><p>Convolution from scratch, Gaussian filters, and Fourier analysis.</p></div>
@@ -380,6 +380,8 @@
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></div><b>Image compositing</b><p>Hybrid images and seamless multiresolution blending.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16M6 16l4-4 3 3 5-6"/></svg></div><b>Performance tradeoffs</b><p>Choosing between accuracy and speed, e.g. NCC vs. L2 and loops vs. vectorization.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14c2-6 4-8 8-8s6 4 8 8"/><path d="M4 10c2 6 4 8 8 8s6-4 8-8"/></svg></div><b>Generative models</b><p>Flow matching, Euler sampling, and classifier-free guidance.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h8v14H3zM14 7l7-3v16l-7-3zM11 12h3"/></svg></div><b>Projective geometry</b><p>Least-squares homographies, image rectification, and cylindrical projection.</p></div>
+                <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 12h16M12 4v16"/><circle cx="10" cy="9" r="2"/></svg></div><b>Image resampling</b><p>Inverse warping, nearest-neighbor and bilinear sampling, and feathered mosaics.</p></div>
                 <div class="skill reveal"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div><b>Python tooling</b><p>NumPy, SciPy, OpenCV, scikit-image, Matplotlib, and PyTorch.</p></div>
             </div>
         </section>

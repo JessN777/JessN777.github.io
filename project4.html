@@ -183,12 +183,12 @@
             html { scroll-behavior: auto; }
             .reveal { opacity: 1; transform: none; transition: none; }
         }
-    
+
 
 .subsection>div:last-child{min-width:0}.prose{max-width:none}
 .draft-note{margin-top:26px;padding:18px 22px;border:1px solid rgba(245,193,103,.35);border-radius:14px;background:rgba(245,193,103,.06);color:var(--body);font-size:14px}.draft-note b{color:#f5c167}
-.answer-block{margin-top:24px;padding:22px;border:1px dashed rgba(245,193,103,.55);border-left:3px solid #f5c167;border-radius:12px;background:rgba(245,193,103,.045)}
-.answer-label{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#f5c167;margin-bottom:10px}.answer-block h4{font-size:16px;color:var(--text);margin-bottom:8px}.answer-block .prompt{font-size:14px;color:var(--body)}.answer{margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,193,103,.16);color:var(--muted);font-size:15px}.answer-code{margin-top:14px;white-space:pre-wrap}
+.answer-block{margin-top:24px;padding:22px;border:1px solid rgba(139,147,255,.3);border-left:3px solid var(--accent);border-radius:12px;background:rgba(139,147,255,.045)}
+.answer-label{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}.answer-block h4{font-size:16px;color:var(--text);margin-bottom:8px}.answer-block .prompt{font-size:14px;color:var(--body)}.answer{margin-top:16px;padding-top:14px;border-top:1px solid rgba(245,193,103,.16);color:var(--body);font-size:15px}.answer-code{margin-top:14px;white-space:pre-wrap}
 .image-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}.image-grid figure{margin-top:0}.image-grid .wide{grid-column:1/-1}
 .media-slot{position:relative;background:#0b0e24;min-height:180px;display:grid;place-items:center;padding:14px}.media-slot img{max-height:650px;object-fit:contain}.media-slot img[hidden]{display:none}.media-slot .missing{display:none}.media-slot.empty .missing{display:flex}.media-slot.empty{min-height:210px;background:linear-gradient(135deg,rgba(139,147,255,.06),rgba(77,163,255,.025))}
 .missing{align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:10px;padding:20px;color:var(--muted);font-size:13px}.missing svg{width:32px;height:32px;color:var(--accent);opacity:.7}.missing b{color:var(--body);font-size:14px}.missing code{overflow-wrap:anywhere;font:11px/1.6 'JetBrains Mono',monospace;max-width:100%}
@@ -203,25 +203,25 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
 </style></head>
 <body><a class="skip-link" href="#capture">Skip to project content</a><div class="progress" id="progress" aria-hidden="true"></div>
 <nav class="topbar" aria-label="Project navigation"><div class="topbar-inner"><a class="brand" href="index.html">← Jessica Nguyen</a><div class="toc" id="toc"><a href="#capture">A.1</a><a href="#homographies">A.2</a><a href="#warping">A.3</a><a href="#mosaics">A.4</a><a href="#extension">A.5</a></div></div></nav>
-<header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 4A</span><h1>Image Warping<br>and <span class="grad">Mosaicing</span></h1><p class="lede">From overlapping photographs to rectified views and panoramic mosaics.</p><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span></div><div class="tags"><span class="tag">Homographies</span><span class="tag">Least Squares</span><span class="tag">Inverse Warping</span><span class="tag">Interpolation</span><span class="tag">Image Blending</span></div><div class="draft-note"><b>Report template · ready for your work</b><br>Every gold <strong>YOUR ANSWER</strong> box marks a response for you to write. Image cards show the filenames to add later. Replace the bracketed text in <code>project4.html</code>; this page does not save typed answers.</div></header>
+<header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 4A</span><h1>Image Warping<br>and <span class="grad">Mosaicing</span></h1><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span></div><div class="tags"><span class="tag">Homographies</span><span class="tag">Least Squares</span><span class="tag">Inverse Warping</span><span class="tag">Interpolation</span><span class="tag">Image Blending</span></div><div class="draft-note"><b>Results from three supplied photographs</b><br>Two window rectifications and three pairwise mosaics are included below. All pairs reuse one building scene. One source is a 167 × 223 thumbnail; camera/capture details and true window proportions were not supplied.</div></header>
 <div class="hero-art"><svg viewBox="0 0 1100 230" role="img" aria-label="Illustration of two overlapping image planes registered into one panorama; not a project result"><defs><linearGradient id="plane" x2="1" y2="1"><stop stop-color="#ff5c7a" stop-opacity=".2"/><stop offset=".5" stop-color="#8b93ff" stop-opacity=".18"/><stop offset="1" stop-color="#4da3ff" stop-opacity=".2"/></linearGradient><pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke="#8b93ff" stroke-opacity=".14"/></pattern></defs><rect width="1100" height="230" fill="url(#grid)"/><g fill="url(#plane)" stroke-width="1.5"><path d="M80 51 303 69 284 170 62 154Z" stroke="#ff8aa0"/><path d="M209 65 432 47 450 153 227 173Z" stroke="#8bb9ff"/><rect x="639" y="51" width="367" height="122" rx="6" stroke="#8b93ff"/></g><g fill="#8b93ff"><circle cx="250" cy="91" r="4"/><circle cx="276" cy="143" r="4"/><circle cx="333" cy="95" r="4"/><circle cx="357" cy="141" r="4"/></g><path d="M485 112h95m-13-12 13 12-13 12" fill="none" stroke="#9aa1c7" stroke-width="2"/><g font-family="Inter,Segoe UI,sans-serif" font-size="13" fill="#9aa1c7" text-anchor="middle"><text x="255" y="207">OVERLAPPING VIEWS</text><text x="533" y="91">H</text><text x="822" y="207">A COMMON PROJECTION</text></g></svg></div>
 <div class="overview"><a class="ov" href="#capture"><span class="n">A.1</span><b>Capture</b><p>Source views and capture notes.</p></a><a class="ov" href="#homographies"><span class="n">A.2</span><b>Recover Geometry</b><p>Correspondences, equations, matrices.</p></a><a class="ov" href="#warping"><span class="n">A.3</span><b>Warp &amp; Rectify</b><p>Two methods, two rectifications.</p></a><a class="ov" href="#mosaics"><span class="n">A.4</span><b>Blend Mosaics</b><p>Three mosaics and your analysis.</p></a></div>
 <main><section id="capture"><div class="part-header"><span class="kicker">PART A · 01</span><h2>Shoot and Digitize Pictures</h2></div><section class="subsection" id="a1"><div class="sub-side"><div class="num">A.1</div><h3>Source Photographs</h3><div class="keys"><span class="key">Fixed camera center</span><span class="key">Overlapping image sets</span></div></div><div><div class="answer-block" id="answer-a1-setup">
-  <div class="answer-label">YOUR ANSWER · A1-SETUP</div>
-  <h4>How did you capture your image sets?</h4><p class="prompt">Describe the scenes, camera or phone, and how you kept the center of projection fixed while rotating. State the overlap and any resizing. Identify which photos you took and credit any other sources.</p>
-  <!-- YOUR ANSWER a1-setup: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A1-SETUP</div>
+  <h4>How did you capture your image sets?</h4>
+
+  <p class="answer">The report uses three supplied night photographs of the same building: 20261027_215256.jpg (686 × 915 pixels), 20261027_215300.jpg (1,220 × 915), and 20261027_215312.jpg (167 × 223). All three are below the 1,600-pixel working-size limit, so they are used at their supplied resolutions. The shared windows and colored light fixtures provide overlap. Three pairwise image sets are evaluated; they reuse these three photographs of one scene. The files contain no camera model or capture-method metadata. The location and whether the camera center was held fixed were not supplied, so these details are not asserted. The earlier ceiling screenshot is retained in the data folder but is not used in these mosaics.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
-  <img src="proj4/images/mosaic1_left.jpg" alt="Set 1 · source photograph" loading="lazy">
+  <img src="proj4/images/mosaic1_left.jpg" alt="Portrait building photograph, 167 pixels wide by 223 pixels high" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_left.jpg</code></div>
-  </div><figcaption><span class="fig">FIG A1.1a</span>Set 1 · source photograph<span class="asset-path">proj4/images/mosaic1_left.jpg</span></figcaption></figure><figure><div class="media-slot">
+  </div><figcaption><span class="fig">FIG A1.1a</span>Set 1 · source photograph · 167 × 223 pixels<span class="asset-path">proj4/images/mosaic1_left.jpg</span></figcaption></figure><figure><div class="media-slot">
   <img src="proj4/images/mosaic1_right.jpg" alt="Set 1 · reference photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_right.jpg</code></div>
   </div><figcaption><span class="fig">FIG A1.1b</span>Set 1 · reference photograph<span class="asset-path">proj4/images/mosaic1_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set1">
-  <div class="answer-label">YOUR ANSWER · A1-SET1</div>
-  <h4>Image set 1: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
-  <!-- YOUR ANSWER a1-set1: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A1-SET1</div>
+  <h4>Image set 1: scene and capture notes</h4>
+
+  <p class="answer">Source: 20261027_215312.jpg (167 × 223 pixels). Reference: 20261027_215300.jpg (1220 × 915). The output canvas is 1275 × 1250, using 16 matches; fitted-point RMSE is 8.7564 reference pixels. The small portrait contributes soft sky and roof detail above the larger landscape view. Feathering reduces the hard transition of the overwrite baseline, but the colored lights and some window edges still show ghosting. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements. This is one of the three pairwise sets from the same building scene.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/mosaic2_left.jpg" alt="Set 2 · source photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_left.jpg</code></div>
@@ -229,10 +229,10 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   <img src="proj4/images/mosaic2_right.jpg" alt="Set 2 · reference photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_right.jpg</code></div>
   </div><figcaption><span class="fig">FIG A1.2b</span>Set 2 · reference photograph<span class="asset-path">proj4/images/mosaic2_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set2">
-  <div class="answer-label">YOUR ANSWER · A1-SET2</div>
-  <h4>Image set 2: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
-  <!-- YOUR ANSWER a1-set2: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A1-SET2</div>
+  <h4>Image set 2: scene and capture notes</h4>
+
+  <p class="answer">Source: 20261027_215256.jpg (686 × 915 pixels). Reference: 20261027_215300.jpg (1220 × 915). The output canvas is 1220 × 1263, using 16 matches; fitted-point RMSE is 7.4711 reference pixels. This pair uses the two larger photos and retains more texture than the thumbnail pairs. The extra portrait coverage extends the building vertically. Window dividers and colored lights show residual doubling; possible parallax and imperfect manual localization cannot be separated from these files alone. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements. This is one of the three pairwise sets from the same building scene.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/mosaic3_left.jpg" alt="Set 3 · source photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_left.jpg</code></div>
@@ -240,54 +240,93 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   <img src="proj4/images/mosaic3_right.jpg" alt="Set 3 · reference photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_right.jpg</code></div>
   </div><figcaption><span class="fig">FIG A1.3b</span>Set 3 · reference photograph<span class="asset-path">proj4/images/mosaic3_right.jpg</span></figcaption></figure></div><div class="answer-block" id="answer-a1-set3">
-  <div class="answer-label">YOUR ANSWER · A1-SET3</div>
-  <h4>Image set 3: scene and capture notes</h4><p class="prompt">Name the location or subject. Explain what overlaps and any movement, lighting change, or lens distortion that could affect alignment.</p>
-  <!-- YOUR ANSWER a1-set3: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A1-SET3</div>
+  <h4>Image set 3: scene and capture notes</h4>
+
+  <p class="answer">Source: 20261027_215312.jpg (167 × 223 pixels). Reference: 20261027_215256.jpg (686 × 915). The output canvas is 801 × 1072, using 16 matches; fitted-point RMSE is 7.5803 reference pixels. The thumbnail is enlarged into the larger portrait view, so its contribution is soft and adds limited new detail. Broad building structure aligns, but there are remaining local window and light mismatches. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements. This is one of the three pairwise sets from the same building scene.</p>
 </div></div></section></section><section id="homographies"><div class="part-header"><span class="kicker">PART A · 02</span><h2>Recover Homographies</h2></div><section class="subsection" id="a2"><div class="sub-side"><div class="num">A.2</div><h3>Point Matches &amp; Geometry</h3><div class="keys"><span class="key">computeH(im1_pts, im2_pts)</span><span class="key">Least-squares recovery</span></div></div><div><div class="answer-block" id="answer-a2-matches">
-  <div class="answer-label">YOUR ANSWER · A2-MATCHES</div>
-  <h4>How did you choose correspondences?</h4><p class="prompt">Describe your point-selection tool, the number of matches per pair, and how you distributed distinctive points across the overlap. Explain why more than four correspondences help.</p>
-  <!-- YOUR ANSWER a2-matches: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A2-MATCHES</div>
+  <h4>How did you choose correspondences?</h4>
+
+  <p class="answer">Sixteen corresponding architectural landmarks were manually identified by the assistant in each supplied photograph. They include visible window corners and colored-light tips, with the same landmark numbering in each view. No automatic feature detector or RANSAC was used. Coordinates are (x, y) pixel centers in the supplied working images. More than four matches make the eight-unknown solve overdetermined and reduce sensitivity to any one point, although noisy clicks and parallax still affect the fit. The thumbnail has particularly uncertain feature locations. The reported reprojection errors use the fitted matches; they are not independent accuracy tests.</p>
 </div><div class="answer-block" id="answer-a2-system">
-  <div class="answer-label">YOUR ANSWER · A2-SYSTEM</div>
-  <h4>Set up your system of equations</h4><p class="prompt">Show the two equations contributed by one (x, y) ↔ (u, v) match, define the eight unknowns, and write the stacked Ah = b system. Explain how you solved the overdetermined system and any normalization used.</p>
-  <!-- YOUR ANSWER a2-system: replace the placeholder below with your own response. -->
-  <pre class="answer answer-code">[Write your answer here.]</pre>
+  <div class="answer-label">REPORT · A2-SYSTEM</div>
+  <h4>Set up your system of equations</h4>
+
+  <pre class="answer answer-code">For a source (x, y) and reference (u, v), set h33 = 1:
+x*h11 + y*h12 + h13 - u*x*h31 - u*y*h32 = u
+x*h21 + y*h22 + h23 - v*x*h31 - v*y*h32 = v
+
+h = [h11, h12, h13, h21, h22, h23, h31, h32]^T
+
+A_i = [x y 1 0 0 0 -u*x -u*y]
+      [0 0 0 x y 1 -v*x -v*y]
+b_i = [u, v]^T
+
+Stack N pairs into A of shape (2N, 8) and b of length 2N.
+Each point set is centered and scaled to mean distance sqrt(2).
+Solve the normalized system with numpy.linalg.lstsq.
+Denormalize: H = inverse(T_reference) @ H_normalized @ T_source.
+Rescale H so H[2,2] = 1 when this entry is nonzero.
+The full numerical A and b are printed by each notebook result cell.</pre>
 </div><figure><div class="media-slot">
   <img src="proj4/results/mosaic1_points.png" alt="Mosaic 1 · numbered matching points in both images" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic1_points.png</code></div>
   </div><figcaption><span class="fig">FIG A2.1</span>Mosaic 1 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic1_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h1">
-  <div class="answer-label">YOUR ANSWER · A2-H1</div>
-  <h4>Mosaic 1: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
-  <!-- YOUR ANSWER a2-h1: replace the placeholder below with your own response. -->
-  <pre class="answer answer-code">[Write your answer here.]</pre>
+  <div class="answer-label">REPORT · A2-H1</div>
+  <h4>Mosaic 1: recovered homography</h4>
+
+  <pre class="answer answer-code">20261027_215312.jpg → 20261027_215300.jpg
+H =
+[[   5.86437443    0.22678909  -54.76440145]
+ [  -0.09602763    5.71263467 -330.73965996]
+ [   0.0002197     0.00016426    1.        ]]
+Matches: 16
+A shape: 32 × 8
+Reprojection RMSE: 8.7564 reference pixels
+Largest fitted-point residual: 16.3789 pixels</pre>
 </div><figure><div class="media-slot">
   <img src="proj4/results/mosaic2_points.png" alt="Mosaic 2 · numbered matching points in both images" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic2_points.png</code></div>
   </div><figcaption><span class="fig">FIG A2.2</span>Mosaic 2 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic2_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h2">
-  <div class="answer-label">YOUR ANSWER · A2-H2</div>
-  <h4>Mosaic 2: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
-  <!-- YOUR ANSWER a2-h2: replace the placeholder below with your own response. -->
-  <pre class="answer answer-code">[Write your answer here.]</pre>
+  <div class="answer-label">REPORT · A2-H2</div>
+  <h4>Mosaic 2: recovered homography</h4>
+
+  <pre class="answer answer-code">20261027_215256.jpg → 20261027_215300.jpg
+H =
+[[   1.34572024   -0.04330097   94.50618106]
+ [   0.04825637    1.35802747 -138.45354961]
+ [  -0.0000339     0.00003851    1.        ]]
+Matches: 16
+A shape: 32 × 8
+Reprojection RMSE: 7.4711 reference pixels
+Largest fitted-point residual: 12.2032 pixels</pre>
 </div><figure><div class="media-slot">
   <img src="proj4/results/mosaic3_points.png" alt="Mosaic 3 · numbered matching points in both images" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic3_points.png</code></div>
   </div><figcaption><span class="fig">FIG A2.3</span>Mosaic 3 · numbered matching points in both images<span class="asset-path">proj4/results/mosaic3_points.png</span></figcaption></figure><div class="answer-block" id="answer-a2-h3">
-  <div class="answer-label">YOUR ANSWER · A2-H3</div>
-  <h4>Mosaic 3: recovered homography</h4><p class="prompt">Paste your actual 3 × 3 matrix. Specify which image maps to which reference, the coordinate convention, the number of matches, and any measured reprojection error. Generated matrices are in the corresponding results JSON file.</p>
-  <!-- YOUR ANSWER a2-h3: replace the placeholder below with your own response. -->
-  <pre class="answer answer-code">[Write your answer here.]</pre>
+  <div class="answer-label">REPORT · A2-H3</div>
+  <h4>Mosaic 3: recovered homography</h4>
+
+  <pre class="answer answer-code">20261027_215312.jpg → 20261027_215256.jpg
+H =
+[[   4.32185257    0.29641521 -114.75620915]
+ [  -0.17886033    4.18086415 -136.55707863]
+ [   0.00038464    0.00000173    1.        ]]
+Matches: 16
+A shape: 32 × 8
+Reprojection RMSE: 7.5803 reference pixels
+Largest fitted-point residual: 16.1766 pixels</pre>
 </div></div></section></section><section id="warping"><div class="part-header"><span class="kicker">PART A · 03</span><h2>Warp and Rectify Images</h2></div><section class="subsection" id="a3"><div class="sub-side"><div class="num">A.3</div><h3>Inverse Warping</h3><div class="keys"><span class="key">Two rectifications</span><span class="key">Two interpolation methods</span></div></div><div><div class="answer-block" id="answer-a3-warp">
-  <div class="answer-label">YOUR ANSWER · A3-WARP</div>
-  <h4>How does your inverse warp work?</h4><p class="prompt">Explain how you find output bounds from transformed corners, handle the canvas offset, map output pixels back to the input, and mask invalid samples. State your convention for pixel centers.</p>
-  <!-- YOUR ANSWER a3-warp: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A3-WARP</div>
+  <h4>How does your inverse warp work?</h4>
+
+  <p class="answer">The four source pixel-center corners are projected through H to obtain floor/ceiling output bounds. For each output pixel, its canvas offset is added to obtain reference coordinates, then H inverse maps it into the source. Dividing by the homogeneous coordinate gives the sampling position. Sampling is performed in strips of 128 output rows. A separate validity mask records finite coordinates inside the source. Real black pixels remain valid; empty canvas regions have alpha zero. The rectifications use an explicit 300 × 400 destination canvas to isolate the selected window rather than projecting the entire photograph.</p>
 </div><div class="answer-block" id="answer-a3-interpolation">
-  <div class="answer-label">YOUR ANSWER · A3-INTERPOLATION</div>
-  <h4>How did you implement both interpolation methods?</h4><p class="prompt">Describe nearest neighbor and derive the four bilinear weights from the fractional source coordinates. Explain your treatment of border pixels. Refer to warpImageNearestNeighbor(im, H) and warpImageBilinear(im, H).</p>
-  <!-- YOUR ANSWER a3-interpolation: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A3-INTERPOLATION</div>
+  <h4>How did you implement both interpolation methods?</h4>
+
+  <p class="answer">Nearest neighbor rounds each valid source coordinate to the closest pixel. Bilinear interpolation uses x0=floor(x), y0=floor(y), dx=x-x0 and dy=y-y0, combining the four samples with weights (1-dx)(1-dy), dx(1-dy), (1-dx)dy, and dx*dy. Neighbor indices are clamped at the final row or column, while the validity mask excludes genuinely out-of-bounds samples. Both methods are implemented with NumPy indexing and arithmetic. Nearest neighbor preserves sample values and exposes stair steps; bilinear interpolation smooths those steps and also softens edges.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/rectification1.jpg" alt="Rectification 1 · original photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/rectification1.jpg</code></div>
@@ -301,10 +340,10 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   <img src="proj4/results/rectification1_bilinear.png" alt="Rectification 1 · bilinear" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification1_bilinear.png</code></div>
   </div><figcaption><span class="fig">FIG A3.1d</span>Rectification 1 · bilinear<span class="asset-path">proj4/results/rectification1_bilinear.png</span></figcaption></figure></div><div class="answer-block" id="answer-a3-rect1">
-  <div class="answer-label">YOUR ANSWER · A3-RECT1</div>
-  <h4>Rectification 1: geometry and result</h4><p class="prompt">Identify the planar rectangular object. Give your source and destination coordinates, explain the known aspect ratio, and describe whether lines and proportions look correct. Compare nearest neighbor and bilinear detail in this example.</p>
-  <!-- YOUR ANSWER a3-rect1: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A3-RECT1</div>
+  <h4>Rectification 1: geometry and result</h4>
+
+  <p class="answer">The upper-left lit window on the front facade in 20261027_215300.jpg is treated as a planar rectangle. The four selected source corners, in clockwise order, are [[669, 544], [747, 531], [751, 628], [674, 640]]. They map to [[0, 0], [299, 0], [299, 399], [0, 399]], producing 300 × 400 pixels. The 3:4 output ratio is a chosen display ratio, not a measured physical window proportion. The result enforces rectangularity; it does not claim metrically correct dimensions. The original saturated panes contain little texture. In the outputs, nearest neighbor shows visible stair steps along the window divider, while bilinear interpolation gives a smoother and slightly softer divider. Some residual tilt in the internal dividers remains, consistent with approximate corner placement and uncorrected source distortion. Median warp-only times were 0.01137 s (nearest) and 0.02962 s (bilinear), after one warm-up and five timed runs.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/rectification2.jpg" alt="Rectification 2 · original photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/rectification2.jpg</code></div>
@@ -318,20 +357,20 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   <img src="proj4/results/rectification2_bilinear.png" alt="Rectification 2 · bilinear" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/rectification2_bilinear.png</code></div>
   </div><figcaption><span class="fig">FIG A3.2d</span>Rectification 2 · bilinear<span class="asset-path">proj4/results/rectification2_bilinear.png</span></figcaption></figure></div><div class="answer-block" id="answer-a3-rect2">
-  <div class="answer-label">YOUR ANSWER · A3-RECT2</div>
-  <h4>Rectification 2: geometry and result</h4><p class="prompt">Identify the planar rectangular object. Give your source and destination coordinates, explain the known aspect ratio, and describe whether lines and proportions look correct. Compare nearest neighbor and bilinear detail in this example.</p>
-  <!-- YOUR ANSWER a3-rect2: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
-</div><div class="table-scroll"><table><caption style="text-align:left;padding:14px;color:var(--body)">YOUR MEASUREMENTS · replace every pending cell</caption><thead><tr><th scope="col">Example</th><th scope="col">Output size (px)</th><th scope="col">Nearest neighbor (s)</th><th scope="col">Bilinear (s)</th></tr></thead><tbody><tr><th scope="row">Rectification 1</th><td class="pending">[Add size]</td><td class="pending">[Add time]</td><td class="pending">[Add time]</td></tr><tr><th scope="row">Rectification 2</th><td class="pending">[Add size]</td><td class="pending">[Add time]</td><td class="pending">[Add time]</td></tr></tbody></table></div><div class="answer-block" id="answer-a3-comparison">
-  <div class="answer-label">YOUR ANSWER · A3-COMPARISON</div>
-  <h4>What are the speed and quality trade-offs?</h4><p class="prompt">Use your measured runtimes and actual results. Compare jagged edges, smoothness, and blur; explain when you would choose each interpolation method. State the image sizes and what your timing includes.</p>
-  <!-- YOUR ANSWER a3-comparison: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A3-RECT2</div>
+  <h4>Rectification 2: geometry and result</h4>
+
+  <p class="answer">The upper-right lit window on the front facade in 20261027_215256.jpg is treated as a planar rectangle. The four selected source corners, in clockwise order, are [[564, 468], [624, 454], [631, 528], [571, 538]]. They map to [[0, 0], [299, 0], [299, 399], [0, 399]], producing 300 × 400 pixels. The 3:4 output ratio is a chosen display ratio, not a measured physical window proportion. The result enforces rectangularity; it does not claim metrically correct dimensions. The original saturated panes contain little texture. In the outputs, nearest neighbor shows visible stair steps along the window divider, while bilinear interpolation gives a smoother and slightly softer divider. Some residual tilt in the internal dividers remains, consistent with approximate corner placement and uncorrected source distortion. Median warp-only times were 0.01187 s (nearest) and 0.02207 s (bilinear), after one warm-up and five timed runs.</p>
+</div><div class="table-scroll"><table><caption style="text-align:left;padding:14px;color:var(--body)">Median warp-only timing, five runs after warm-up</caption><thead><tr><th scope="col">Example</th><th scope="col">Output size (px)</th><th scope="col">Nearest neighbor (s)</th><th scope="col">Bilinear (s)</th></tr></thead><tbody><tr><th scope="row">Rectification 1</th><td>300 × 400</td><td>0.01137</td><td>0.02962</td></tr><tr><th scope="row">Rectification 2</th><td>300 × 400</td><td>0.01187</td><td>0.02207</td></tr></tbody></table></div><div class="answer-block" id="answer-a3-comparison">
+  <div class="answer-label">REPORT · A3-COMPARISON</div>
+  <h4>What are the speed and quality trade-offs?</h4>
+
+  <p class="answer">Both rectifications have the same 300 × 400 output size. Each time is the median of five warp-only calls after one warm-up; loading, plotting, and saving are excluded. rectification1: nearest 0.01137 s; bilinear 0.02962 s. rectification2: nearest 0.01187 s; bilinear 0.02207 s. Nearest neighbor requires fewer samples and is appropriate for discrete labels or when sample preservation matters. Bilinear uses four samples and arithmetic weights; it is preferable for smoother photographic magnification. Absolute timings are machine-dependent and these small vectorized jobs include memory-allocation overhead. The nearest-neighbor window bars are visibly stepped; bilinear smooths their boundaries. Neither method can restore detail absent from the source.</p>
 </div></div></section></section><section id="mosaics"><div class="part-header"><span class="kicker">PART A · 04</span><h2>Blend Images into a Mosaic</h2></div><section class="subsection" id="a4"><div class="sub-side"><div class="num">A.4</div><h3>Image Mosaics</h3><div class="keys"><span class="key">Three source pairs</span><span class="key">Weighted blending</span></div></div><div><div class="answer-block" id="answer-a4-procedure">
-  <div class="answer-label">YOUR ANSWER · A4-PROCEDURE</div>
-  <h4>How did you build and blend the mosaics?</h4><p class="prompt">Explain your choice of reference, shared output canvas, transformation of each source, alpha or feathering weights, and weighted-average formula. Explain how you handle non-overlap and avoid hard overwrite seams.</p>
-  <!-- YOUR ANSWER a4-procedure: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · A4-PROCEDURE</div>
+  <h4>How did you build and blend the mosaics?</h4>
+
+  <p class="answer">For each pair the left source is mapped into the right reference, whose homography is the identity. The union of both transformed corner bounds defines one shared canvas. Each source pixel receives a positive distance-to-boundary weight min(x+1, width-x, y+1, height-y). Images and weight maps are inverse warped with bilinear interpolation. At each valid canvas pixel the result is sum(weight × RGB) / sum(weight); single-image regions retain their available image. An overwrite baseline is also saved for comparison. Feathering softens intensity transitions but cannot correct misregistration, restore missing thumbnail detail, or eliminate parallax.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/mosaic1_left.jpg" alt="Mosaic 1 · source photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic1_left.jpg</code></div>
@@ -341,11 +380,11 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   </div><figcaption><span class="fig">FIG A4.1b</span>Mosaic 1 · reference photograph<span class="asset-path">proj4/images/mosaic1_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
   <img src="proj4/results/mosaic1_mosaic.png" alt="Mosaic 1 · blended result" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic1_mosaic.png</code></div>
-  </div><figcaption><span class="fig">FIG A4.1c</span>Mosaic 1 · blended result<span class="asset-path">proj4/results/mosaic1_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic1">
-  <div class="answer-label">YOUR ANSWER · A4-MOSAIC1</div>
-  <h4>Mosaic 1: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
-  <!-- YOUR ANSWER a4-mosaic1: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  </div><figcaption><span class="fig">FIG A4.1c</span>Mosaic 1 · blended result<span class="asset-path">proj4/results/mosaic1_mosaic.png</span></figcaption></figure></div><figure><div class="media-slot"><img src="proj4/results/mosaic1_blend_comparison.png" alt="Mosaic 1: overwrite baseline and feathered result" loading="lazy"></div><figcaption><span class="fig">COMPARISON 1</span>Overwrite baseline and feathered result on the same canvas.</figcaption></figure><div class="answer-block" id="answer-a4-mosaic1">
+  <div class="answer-label">REPORT · A4-MOSAIC1</div>
+  <h4>Mosaic 1: evaluate your result</h4>
+
+  <p class="answer">Source: 20261027_215312.jpg (167 × 223 pixels). Reference: 20261027_215300.jpg (1220 × 915). The output canvas is 1275 × 1250, using 16 matches; fitted-point RMSE is 8.7564 reference pixels. The small portrait contributes soft sky and roof detail above the larger landscape view. Feathering reduces the hard transition of the overwrite baseline, but the colored lights and some window edges still show ghosting. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/mosaic2_left.jpg" alt="Mosaic 2 · source photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic2_left.jpg</code></div>
@@ -355,11 +394,11 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   </div><figcaption><span class="fig">FIG A4.2b</span>Mosaic 2 · reference photograph<span class="asset-path">proj4/images/mosaic2_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
   <img src="proj4/results/mosaic2_mosaic.png" alt="Mosaic 2 · blended result" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic2_mosaic.png</code></div>
-  </div><figcaption><span class="fig">FIG A4.2c</span>Mosaic 2 · blended result<span class="asset-path">proj4/results/mosaic2_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic2">
-  <div class="answer-label">YOUR ANSWER · A4-MOSAIC2</div>
-  <h4>Mosaic 2: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
-  <!-- YOUR ANSWER a4-mosaic2: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  </div><figcaption><span class="fig">FIG A4.2c</span>Mosaic 2 · blended result<span class="asset-path">proj4/results/mosaic2_mosaic.png</span></figcaption></figure></div><figure><div class="media-slot"><img src="proj4/results/mosaic2_blend_comparison.png" alt="Mosaic 2: overwrite baseline and feathered result" loading="lazy"></div><figcaption><span class="fig">COMPARISON 2</span>Overwrite baseline and feathered result on the same canvas.</figcaption></figure><div class="answer-block" id="answer-a4-mosaic2">
+  <div class="answer-label">REPORT · A4-MOSAIC2</div>
+  <h4>Mosaic 2: evaluate your result</h4>
+
+  <p class="answer">Source: 20261027_215256.jpg (686 × 915 pixels). Reference: 20261027_215300.jpg (1220 × 915). The output canvas is 1220 × 1263, using 16 matches; fitted-point RMSE is 7.4711 reference pixels. This pair uses the two larger photos and retains more texture than the thumbnail pairs. The extra portrait coverage extends the building vertically. Window dividers and colored lights show residual doubling; possible parallax and imperfect manual localization cannot be separated from these files alone. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements.</p>
 </div><div class="image-grid"><figure><div class="media-slot">
   <img src="proj4/images/mosaic3_left.jpg" alt="Mosaic 3 · source photograph" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/images/mosaic3_left.jpg</code></div>
@@ -369,27 +408,32 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
   </div><figcaption><span class="fig">FIG A4.3b</span>Mosaic 3 · reference photograph<span class="asset-path">proj4/images/mosaic3_right.jpg</span></figcaption></figure><figure class="wide"><div class="media-slot">
   <img src="proj4/results/mosaic3_mosaic.png" alt="Mosaic 3 · blended result" loading="lazy">
   <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/mosaic3_mosaic.png</code></div>
-  </div><figcaption><span class="fig">FIG A4.3c</span>Mosaic 3 · blended result<span class="asset-path">proj4/results/mosaic3_mosaic.png</span></figcaption></figure></div><div class="answer-block" id="answer-a4-mosaic3">
-  <div class="answer-label">YOUR ANSWER · A4-MOSAIC3</div>
-  <h4>Mosaic 3: evaluate your result</h4><p class="prompt">Describe the scene and alignment quality. Point out any visible seams, ghosting, exposure mismatch, or parallax. Explain how blending helped and what you would improve.</p>
-  <!-- YOUR ANSWER a4-mosaic3: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
-</div></div></section></section><section id="extension"><div class="part-header"><span class="kicker">PART A · 05</span><h2>Bells and Whistles</h2></div><section class="subsection" id="a5"><div class="sub-side"><div class="num">A.5</div><h3>Extension</h3><div class="keys"><span class="key">CS280A requirement</span></div></div><div><p class="prose">Required for CS280A; optional for CS180. Complete this section if you implement an extension.</p><div class="answer-block" id="answer-a5-extension">
-  <div class="answer-label">YOUR ANSWER · A5-EXTENSION</div>
-  <h4>Did you implement an extension?</h4><p class="prompt">If applicable, explain your spherical, cylindrical, polar, or other extension, its parameters, and how you sample from the original images. Add your result below and compare it with the planar mosaic. Otherwise state that you did not complete an extension.</p>
-  <!-- YOUR ANSWER a5-extension: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
-</div><figure><div class="media-slot">
-  <img src="proj4/results/extension.png" alt="Extension result · add if applicable" loading="lazy">
-  <div class="missing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg><b>Add your image here</b><code>proj4/results/extension.png</code></div>
-  </div><figcaption><span class="fig">FIG A5.1</span>Extension result · add if applicable<span class="asset-path">proj4/results/extension.png</span></figcaption></figure></div></section></section>
+  </div><figcaption><span class="fig">FIG A4.3c</span>Mosaic 3 · blended result<span class="asset-path">proj4/results/mosaic3_mosaic.png</span></figcaption></figure></div><figure><div class="media-slot"><img src="proj4/results/mosaic3_blend_comparison.png" alt="Mosaic 3: overwrite baseline and feathered result" loading="lazy"></div><figcaption><span class="fig">COMPARISON 3</span>Overwrite baseline and feathered result on the same canvas.</figcaption></figure><div class="answer-block" id="answer-a4-mosaic3">
+  <div class="answer-label">REPORT · A4-MOSAIC3</div>
+  <h4>Mosaic 3: evaluate your result</h4>
+
+  <p class="answer">Source: 20261027_215312.jpg (167 × 223 pixels). Reference: 20261027_215256.jpg (686 × 915). The output canvas is 801 × 1072, using 16 matches; fitted-point RMSE is 7.5803 reference pixels. The thumbnail is enlarged into the larger portrait view, so its contribution is soft and adds limited new detail. Broad building structure aligns, but there are remaining local window and light mismatches. Empty corner wedges are transparent canvas, not missing source samples. A higher-resolution source, more accurate points, and a fixed camera center would be the next improvements.</p>
+</div></div></section></section><section id="extension"><div class="part-header"><span class="kicker">PART A · 05</span><h2>Bells and Whistles</h2></div><section class="subsection" id="a5"><div class="sub-side"><div class="num">A.5</div><h3>Cylindrical Projection</h3><div class="keys"><span class="key">Three original images</span><span class="key">f = 976 pixels</span><span class="key">Direct inverse sampling</span></div></div><div><div class="answer-block" id="answer-a5-extension"><div class="answer-label">REPORT · A5-EXTENSION</div><h4>Cylindrical projection and focal-length comparison</h4><p class="answer">I implemented a cylindrical compositing surface using all three supplied building photographs. The landscape image is the common reference. The other two views use the existing source-to-reference homographies from mosaics 2 and 1. The planar baseline uses these same three inputs and registrations, so the comparison isolates the change in output surface rather than adding a different photograph.</p><pre>Reference plane to unwrapped cylinder:
+dx = x - cx
+u = f * atan(dx / f)
+v = f * (y - cy) / sqrt(dx*dx + f*f)
+
+Inverse lookup for each output (u, v):
+theta = u / f
+x = cx + f * tan(theta)
+y = cy + v / cos(theta)
+source_pixel = normalize(inverse(H_source_to_reference) @ [x, y, 1])
+
+Read the source color once with custom bilinear interpolation.
+The current shared-reference construction covers the visible finite plane
+branch; it is not a calibrated 360-degree capture.</pre><p class="answer">For each cylindrical output pixel, I invert the cylinder projection, then apply the corresponding inverse homography to locate a point in each original source. A custom four-neighbor bilinear sampler reads RGB directly from that source. This composes both geometric transforms before interpolation, avoiding an intermediate warped RGB mosaic and its extra interpolation. A separate validity mask excludes unsupported samples while preserving real black pixels. Continuous distance-to-source-boundary weights feather valid contributions. Canvas bounds sample every source edge pixel, since a nonlinear projection can have boundary extrema between the four corners.</p><p class="answer">The virtual principal point is (609.5, 457) in the 1,220 × 915 reference image. I compared focal lengths 610, 976, 1464 pixels and chose f = 976 pixels (0.8 times reference width). The 610-pixel version bends the outer architecture more strongly; the 1,464-pixel version stays closer to the planar view. The chosen middle setting gives a visible cylindrical projection without the strongest boundary bending. This focal length is a visual parameter, not a recovered or calibrated camera focal length.</p><p class="answer">The selected cylindrical canvas is 1132 × 1441 pixels; the same-input planar canvas is 1275 × 1459. Cylindrical coordinates compress horizontal positions farther from the reference center and curve some straight architectural boundaries. The supplied low-resolution thumbnail still looks soft, and ghosting near windows and colored lights remains because the registrations are unchanged. This extension changes the compositing surface; it does not repair parallax or missing detail. Transparent wedges mark output regions without source coverage. The selected direct warp-and-blend call took 1.870 s (one run, excluding image loading, saving, and figure generation).</p><p class="answer">Projection background: <a href="https://helper.ipam.ucla.edu/publications/gss2013/gss2013_11333.pdf">Richard Szeliski, Image Stitching (IPAM 2013)</a>.</p></div><figure><div class="media-slot"><img src="proj4/results/extension.png" alt="Cylindrical mosaic from all three original photos, f = 976 pixels." loading="lazy"></div><figcaption><span class="fig">FIG A5.1</span>Cylindrical mosaic from all three original photos, f = 976 pixels.</figcaption></figure><figure><div class="media-slot"><img src="proj4/results/extension_comparison.png" alt="Planar and cylindrical mosaics using the same three images and registrations." loading="lazy"></div><figcaption><span class="fig">FIG A5.2</span>Planar and cylindrical mosaics using the same three images and registrations.</figcaption></figure><figure><div class="media-slot"><img src="proj4/results/extension_focal_comparison.png" alt="Focal-length sensitivity: 610, 976, and 1464 pixels." loading="lazy"></div><figcaption><span class="fig">FIG A5.3</span>Focal-length sensitivity: 610, 976, and 1464 pixels.</figcaption></figure></div></section></section>
 <section class="learned" id="learned"><div class="kicker">REFLECTION</div><h2>What I Learned</h2><div class="answer-block" id="answer-reflection">
-  <div class="answer-label">YOUR ANSWER · REFLECTION</div>
-  <h4>What did you learn from this project?</h4><p class="prompt">Reflect on homography estimation, choosing good point matches, interpolation, and blending. Describe a challenge you encountered and what changed your understanding.</p>
-  <!-- YOUR ANSWER reflection: replace the placeholder below with your own response. -->
-  <p class="answer">[Write your answer here.]</p>
+  <div class="answer-label">REPORT · REFLECTION</div>
+  <h4>What did you learn from this project?</h4>
+
+  <p class="answer">The results show that correspondence quality and input resolution strongly limit the final mosaic. The 167 × 223 source contributes visibly soft regions when enlarged. Inverse mapping produces filled image regions without forward-warp holes, and explicit masks keep valid black pixels separate from empty canvas. Bilinear interpolation makes the rectified window bars smoother than nearest neighbor, with some loss of sharpness. Weighted averaging softens seams while residual doubling around windows and lights remains. Better landmark localization, original-resolution photos, and capture around a fixed camera center would improve registration. Four fitted rectification corners having near-zero residual does not validate the assumed physical aspect ratio. The cylindrical extension composes the final projection and source homographies before color sampling, and the focal-length comparison shows the resulting change in boundary curvature. Existing registration errors remain visible.</p>
 </div></section>
-<div class="resource-links"><a href="proj4/README.md">Where to add answers and images</a><a href="proj4/mosaic.py">Python implementation</a><a href="proj4/requirements.txt">Python requirements</a></div>
+<div class="resource-links"><a href="proj4/README.md">Where to add answers and images</a></div>
 <div class="next"><a href="project3.html"><small>← PREVIOUS</small><b>Project 3: Fun with Flow Models</b></a><a href="index.html#projects"><small>BACK TO →</small><b>All Projects</b></a></div></main>
 <footer>© 2026 Jessica Nguyen · CS180 Computer Vision, UC Berkeley</footer>
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded project image" tabindex="-1"><button type="button" id="close-lightbox">Close ×</button><img alt=""><p></p></div>
