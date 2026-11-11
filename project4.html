@@ -471,7 +471,9 @@ branch; it is not a calibrated 360-degree capture.</pre><p class="answer">For ea
 <section id="matching">
 <div class="part-header"><span class="kicker">PART B · 03</span><h2>Feature Matching</h2></div>
 <section class="subsection" id="b3"><div class="sub-side"><div class="num">B.3</div><h3>Lowe Ratio Test</h3><div class="keys"><span class="key">Ratio threshold 0.75</span></div></div><div>
-<p class="prose">Green lines show RANSAC inliers. Orange lines show rejected matches.</p>
+<div class="prose">
+  <p>I compared descriptors between the two photos using Euclidean distance. For each descriptor in the source photo, I found its two nearest neighbors in the reference photo. I kept a match only if the closest one was clearly better than the runner-up, specifically less than 0.75 times the second-closest distance. That ratio test removes matches that could belong to any of several similar-looking windows. I also required the match to work in both directions, meaning each descriptor had to be the other’s nearest neighbor. That cut down on ambiguous pairings further. This left 18, 77, and 52 candidate matches for the three pairs. In the figures, green lines are the matches RANSAC kept and orange lines are the ones it rejected.</p>
+</div>
 <figure>
   <div class="img-wrap"><a href="proj4/results_b/mosaic1_matches.png"><img src="proj4/results_b/mosaic1_matches.png" alt="Feature matches for pair 1, with green inliers and orange rejected matches." width="1255" height="870" loading="lazy" decoding="async"></a></div>
   <figcaption><span class="fig">FIG B3.1</span>Pair 1 · 13 of 18 candidate matches kept by RANSAC.</figcaption>
@@ -489,7 +491,11 @@ branch; it is not a calibrated 360-degree capture.</pre><p class="answer">For ea
 <section id="ransac">
 <div class="part-header"><span class="kicker">PART B · 04</span><h2>Automatic Mosaics</h2></div>
 <section class="subsection" id="b4"><div class="sub-side"><div class="num">B.4</div><h3>Four-Point RANSAC</h3></div><div>
-<p class="prose">The three mosaics use different pairings of the same building photos. Black borders mark areas outside both source images.</p>
+<div class="prose">
+  <p>I estimated each homography with four-point RANSAC. In each of 1,200 trials, I sampled four matches, fit a homography, and projected every candidate match into the reference image. A match counted as an inlier if its projected position landed within about four pixels of its partner in the reference detection scale. I kept the model with the most inliers and refit it using all of them. The single-scale runs retained 13 of 18, 51 of 77, and 49 of 52 matches.</p>
+  <p>I reused the warping code from Part A to build the automatic mosaics, then compared them side by side with the manual versions. For Mosaics 1 and 3, I weighted the larger reference photo more heavily in the overlap so the window detail stayed sharp. The areas covered only by the 167 × 223 thumbnail still look soft, though.</p>
+  <p>The three mosaics use different pairings of the same building photos. Black borders mark areas outside both source images.</p>
+</div>
 <figure id="b4-mosaic1">
   <div class="img-wrap"><a href="proj4/results_b/mosaic1_mosaics.png"><img src="proj4/results_b/mosaic1_mosaics.png" alt="Three side-by-side stitches for mosaic 1, labeled Manual, Automatic, and Multiscale." width="1773" height="566" loading="lazy" decoding="async"></a></div>
   <figcaption><span class="fig">FIG B4.1</span>Mosaic 1 · Manual, single-scale automatic, and multiscale automatic.</figcaption>
@@ -507,7 +513,11 @@ branch; it is not a calibrated 360-degree capture.</pre><p class="answer">For ea
 <section id="auto-extra">
 <div class="part-header"><span class="kicker">PART B · 05</span><h2>Bells and Whistles</h2></div>
 <section class="subsection" id="b5"><div class="sub-side"><div class="num">B.5</div><h3>Multiscale Autostitching</h3></div><div>
-<p class="prose">The right panel of each comparison shows the multiscale result. See <a href="#b4-mosaic1">Mosaic 1</a> (64 of 66 inliers), <a href="#b4-mosaic2">Mosaic 2</a> (149 of 170), and <a href="#b4-mosaic3">Mosaic 3</a> (49 of 52).</p>
+<div class="prose">
+  <p>I tried up to six working resolutions for each photo. At each one, I ran Harris detection and ANMS and computed a fresh set of descriptors. I matched features across pairs of resolutions, mapped their coordinates back to the original working images, and then fit each homography. For each pair, I kept the scale combination that produced the most RANSAC inliers.</p>
+  <p>Because the inlier tolerance in pixels changes with scale, I compared alignment using error on the same manually picked landmarks. Mosaic 1 improved from 13.19 to 10.46 pixels in root-mean-square landmark error. Mosaic 2 came out nearly the same with both methods. Mosaic 3 picked the same scales as the single-scale run and produced an identical result.</p>
+  <p>The right panel of each comparison shows the multiscale result. See <a href="#b4-mosaic1">Mosaic 1</a> (64 of 66 inliers), <a href="#b4-mosaic2">Mosaic 2</a> (149 of 170), and <a href="#b4-mosaic3">Mosaic 3</a> (49 of 52).</p>
+</div>
 </div></section>
 </section>
 <div class="next"><a href="project3.html"><small>← PREVIOUS</small><b>Project 3: Flow Models</b></a><a href="index.html"><small>BACK TO →</small><b>All Projects</b></a></div>
