@@ -203,7 +203,7 @@ pre{font:12px/1.7 'JetBrains Mono',monospace;overflow:auto;padding:18px;backgrou
 </style></head>
 <body><a class="skip-link" href="#capture">Skip to project content</a><div class="progress" id="progress" aria-hidden="true"></div>
 <nav class="topbar" aria-label="Project navigation"><div class="topbar-inner"><a class="brand" href="index.html">← Jessica Nguyen</a><div class="toc" id="toc"><a href="#capture">A.1</a><a href="#homographies">A.2</a><a href="#warping">A.3</a><a href="#mosaics">A.4</a><a href="#extension">A.5</a><a href="#harris">B.1</a><a href="#descriptors">B.2</a><a href="#matching">B.3</a><a href="#ransac">B.4</a><a href="#auto-extra">B.5</a></div></div></nav>
-<header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 4</span><h1>Image Warping<br>and <span class="grad">Mosaicing</span></h1><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span></div><div class="tags"><span class="tag">Homographies</span><span class="tag">Harris Corners</span><span class="tag">RANSAC</span><span class="tag">Inverse Warping</span><span class="tag">Image Blending</span></div><div class="draft-note"><b>Part A is filled in. Part B is the outline.</b><br>Two window rectifications and three pairwise mosaics are included below. Part B, after the cylindrical extension, has the automatic-stitching sections. The gray boxes are the figures and notes still to add.</div></header>
+<header class="hero"><span class="eyebrow">CS180 · Computer Vision · Project 4</span><h1>Image Warping<br>and <span class="grad">Mosaicing</span></h1><div class="meta"><span><b>Author</b>Jessica Nguyen</span><span><b>Course</b>CS180, UC Berkeley</span><span><b>Term</b>Fall 2026</span></div><div class="tags"><span class="tag">Homographies</span><span class="tag">Harris Corners</span><span class="tag">RANSAC</span><span class="tag">Inverse Warping</span><span class="tag">Image Blending</span></div></header>
 <div class="hero-art"><svg viewBox="0 0 1100 230" role="img" aria-label="Illustration of two overlapping image planes registered into one panorama; not a project result"><defs><linearGradient id="plane" x2="1" y2="1"><stop stop-color="#ff5c7a" stop-opacity=".2"/><stop offset=".5" stop-color="#8b93ff" stop-opacity=".18"/><stop offset="1" stop-color="#4da3ff" stop-opacity=".2"/></linearGradient><pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke="#8b93ff" stroke-opacity=".14"/></pattern></defs><rect width="1100" height="230" fill="url(#grid)"/><g fill="url(#plane)" stroke-width="1.5"><path d="M80 51 303 69 284 170 62 154Z" stroke="#ff8aa0"/><path d="M209 65 432 47 450 153 227 173Z" stroke="#8bb9ff"/><rect x="639" y="51" width="367" height="122" rx="6" stroke="#8b93ff"/></g><g fill="#8b93ff"><circle cx="250" cy="91" r="4"/><circle cx="276" cy="143" r="4"/><circle cx="333" cy="95" r="4"/><circle cx="357" cy="141" r="4"/></g><path d="M485 112h95m-13-12 13 12-13 12" fill="none" stroke="#9aa1c7" stroke-width="2"/><g font-family="Inter,Segoe UI,sans-serif" font-size="13" fill="#9aa1c7" text-anchor="middle"><text x="255" y="207">OVERLAPPING VIEWS</text><text x="533" y="91">H</text><text x="822" y="207">A COMMON PROJECTION</text></g></svg></div>
 <div class="overview"><a class="ov" href="#capture"><span class="n">A.1</span><b>Capture</b><p>Source views and capture notes.</p></a><a class="ov" href="#homographies"><span class="n">A.2</span><b>Recover Geometry</b><p>Correspondences, equations, matrices.</p></a><a class="ov" href="#warping"><span class="n">A.3</span><b>Warp &amp; Rectify</b><p>Two methods, two rectifications.</p></a><a class="ov" href="#mosaics"><span class="n">A.4</span><b>Blend Mosaics</b><p>Three mosaics and your analysis.</p></a><a class="ov" href="#harris"><span class="n">B.1</span><b>Harris Corners</b><p>Corners, then adaptive suppression.</p></a><a class="ov" href="#descriptors"><span class="n">B.2</span><b>Descriptors</b><p>Normalized 8×8 patches.</p></a><a class="ov" href="#matching"><span class="n">B.3</span><b>Matching</b><p>Lowe’s nearest-neighbor ratio.</p></a><a class="ov" href="#ransac"><span class="n">B.4</span><b>RANSAC</b><p>Automatic homographies and mosaics.</p></a></div>
 <main><section id="capture"><div class="part-header"><span class="kicker">PART A · 01</span><h2>Shoot and Digitize Pictures</h2></div><section class="subsection" id="a1"><div class="sub-side"><div class="num">A.1</div><h3>Source Photographs</h3><div class="keys"><span class="key">Fixed camera center</span><span class="key">Overlapping image sets</span></div></div><div><div class="answer-block" id="answer-a1-setup">
@@ -427,46 +427,81 @@ source_pixel = normalize(inverse(H_source_to_reference) @ [x, y, 1])
 Read the source color once with custom bilinear interpolation.
 The current shared-reference construction covers the visible finite plane
 branch; it is not a calibrated 360-degree capture.</pre><p class="answer">For each cylindrical output pixel, I invert the cylinder projection, then apply the corresponding inverse homography to locate a point in each original source. A custom four-neighbor bilinear sampler reads RGB directly from that source. This composes both geometric transforms before interpolation, avoiding an intermediate warped RGB mosaic and its extra interpolation. A separate validity mask excludes unsupported samples while preserving real black pixels. Continuous distance-to-source-boundary weights feather valid contributions. Canvas bounds sample every source edge pixel, since a nonlinear projection can have boundary extrema between the four corners.</p><p class="answer">The virtual principal point is (609.5, 457) in the 1,220 × 915 reference image. I compared focal lengths 610, 976, 1464 pixels and chose f = 976 pixels (0.8 times reference width). The 610-pixel version bends the outer architecture more strongly; the 1,464-pixel version stays closer to the planar view. The chosen middle setting gives a visible cylindrical projection without the strongest boundary bending. This focal length is a visual parameter, not a recovered or calibrated camera focal length.</p><p class="answer">The selected cylindrical canvas is 1132 × 1441 pixels; the same-input planar canvas is 1275 × 1459. Cylindrical coordinates compress horizontal positions farther from the reference center and curve some straight architectural boundaries. The supplied low-resolution thumbnail still looks soft, and ghosting near windows and colored lights remains because the registrations are unchanged. This extension changes the compositing surface; it does not repair parallax or missing detail. Transparent wedges mark output regions without source coverage. The selected direct warp-and-blend call took 1.870 s (one run, excluding image loading, saving, and figure generation).</p><p class="answer">Projection background: <a href="https://helper.ipam.ucla.edu/publications/gss2013/gss2013_11333.pdf">Richard Szeliski, Image Stitching (IPAM 2013)</a>.</p></div><figure><div class="media-slot"><img src="proj4/results/extension.png" alt="Cylindrical mosaic from all three original photos, f = 976 pixels." loading="lazy"></div><figcaption><span class="fig">FIG A5.1</span>Cylindrical mosaic from all three original photos, f = 976 pixels.</figcaption></figure><figure><div class="media-slot"><img src="proj4/results/extension_comparison.png" alt="Planar and cylindrical mosaics using the same three images and registrations." loading="lazy"></div><figcaption><span class="fig">FIG A5.2</span>Planar and cylindrical mosaics using the same three images and registrations.</figcaption></figure><figure><div class="media-slot"><img src="proj4/results/extension_focal_comparison.png" alt="Focal-length sensitivity: 610, 976, and 1464 pixels." loading="lazy"></div><figcaption><span class="fig">FIG A5.3</span>Focal-length sensitivity: 610, 976, and 1464 pixels.</figcaption></figure></div></section></section>
-<section id="harris"><div class="part-header"><span class="kicker">PART B · 01</span><h2>Harris Corner Detection</h2></div>
-<p class="prose" style="margin-top:28px">Part B follows Brown, Szeliski, and Winder, “Multi-Image Matching using Multi-Scale Oriented Patches,” with the course simplifications: one scale, no sub-pixel refinement, no rotation invariance, and no wavelet transform. Harris corners may come from the supplied <span class="mono">harris.py</span>.</p>
-<section class="subsection" id="b1-harris"><div class="sub-side"><div class="num">B.1</div><h3>Interest Points</h3><div class="keys"><span class="key">Single scale</span><span class="key">No sub-pixel</span><span class="key">Paper §2</span></div></div><div>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>How did you detect corners?</h4><p class="prompt">Record the Harris settings you used. Leave the implementation details for after you run it.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Add the Harris overlay</b><code>Corners from Harris, drawn on the image</code></div></div><figcaption><span class="fig">FIG B1.1</span>Harris corners overlaid on the image, before adaptive suppression.</figcaption></figure>
-</div></section>
-<section class="subsection" id="b1-anms"><div class="sub-side"><div class="num">B.1</div><h3>Adaptive Non-Maximal Suppression</h3><div class="keys"><span class="key">Paper §3</span><span class="key">Spread-out corners</span></div></div><div>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>Which corners did you keep?</h4><p class="prompt">Say how many points you kept and how the suppression radius was chosen. A random subset is fine as a temporary stand-in.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Add the ANMS overlay</b><code>The same image after adaptive non-maximal suppression</code></div></div><figcaption><span class="fig">FIG B1.2</span>Corners kept after adaptive non-maximal suppression.</figcaption></figure>
-</div></section>
-</section>
-<section id="descriptors"><div class="part-header"><span class="kicker">PART B · 02</span><h2>Feature Descriptor Extraction</h2></div>
-<section class="subsection" id="b2"><div class="sub-side"><div class="num">B.2</div><h3>Axis-Aligned Patches</h3><div class="keys"><span class="key">8×8 from a 40×40 window</span><span class="key">Bias / gain normalize</span><span class="key">Paper §4</span></div></div><div>
-<p class="prose">Sample each descriptor from a larger blurred window, then bias- and gain-normalize it. Skip rotation invariance and the wavelet transform.</p>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>What do the descriptors look like?</h4><p class="prompt">Name the blur and the sampling you used, then show several extracted 8×8 patches.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Add several descriptors</b><code>A few normalized 8×8 patches, with the image region they came from</code></div></div><figcaption><span class="fig">FIG B2.1</span>Normalized 8×8 feature descriptors.</figcaption></figure>
-</div></section>
-</section>
-<section id="matching"><div class="part-header"><span class="kicker">PART B · 03</span><h2>Feature Matching</h2></div>
-<section class="subsection" id="b3"><div class="sub-side"><div class="num">B.3</div><h3>Lowe Ratio Test</h3><div class="keys"><span class="key">1st / 2nd nearest neighbor</span><span class="key">Paper §5, Fig. 6b</span><span class="key">Skip paper §6</span></div></div><div>
-<p class="prose">Keep a match when the nearest neighbor is sufficiently closer than the second nearest neighbor. Use Figure 6b in the paper to choose the ratio threshold.</p>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>Which pairs survived?</h4><p class="prompt">Record the ratio threshold and how many matches remained for each image pair.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Add a match figure</b><code>Corresponding features drawn between an image pair</code></div></div><figcaption><span class="fig">FIG B3.1</span>Matched features between one image pair.</figcaption></figure>
-<figure><div class="media-slot empty"><div class="missing"><b>Add another pair</b><code>A second image pair, if you match more than one</code></div></div><figcaption><span class="fig">FIG B3.2</span>Matched features for another pair.</figcaption></figure>
+<section id="harris">
+<div class="part-header"><span class="kicker">PART B · 01</span><h2>Harris Corner Detection</h2></div>
+<section class="subsection" id="b1-harris"><div class="sub-side"><div class="num">B.1</div><h3 id="b1-anms">Corners and ANMS</h3></div><div>
+<p class="prose">Each figure shows the source photo above the reference photo. Harris detections are on the left and the adaptive non-maximal suppression (ANMS) selections are on the right. <a href="https://cs.nyu.edu/~fergus/teaching/comp_photo/readings/BrownSzeliskiWinder2005-MOPs.pdf">MOPS paper</a></p>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic1_corners.png"><img src="proj4/results_b/mosaic1_corners.png" alt="Pair 1 source and reference photos with detected corners on the left and ANMS corners on the right." width="1192" height="973" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B1.1</span>Pair 1 · Harris detections and ANMS selections.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic2_corners.png"><img src="proj4/results_b/mosaic2_corners.png" alt="Pair 2 source and reference photos with detected corners on the left and ANMS corners on the right." width="1192" height="973" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B1.2</span>Pair 2 · Harris detections and ANMS selections.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic3_corners.png"><img src="proj4/results_b/mosaic3_corners.png" alt="Pair 3 source and reference photos with detected corners on the left and ANMS corners on the right." width="978" height="985" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B1.3</span>Pair 3 · Harris detections and ANMS selections.</figcaption>
+</figure>
 </div></section>
 </section>
-<section id="ransac"><div class="part-header"><span class="kicker">PART B · 04</span><h2>RANSAC and Automatic Mosaics</h2></div>
-<section class="subsection" id="b4"><div class="sub-side"><div class="num">B.4</div><h3>4-Point RANSAC</h3><div class="keys"><span class="key">Written from scratch</span><span class="key">Reuse the Part A warp</span><span class="key">At least 3 mosaics</span></div></div><div>
-<p class="prose">Estimate the homography with 4-point RANSAC, then warp and blend with the Part A code. Put the manual mosaic and the automatic mosaic side by side. Make at least three automatic mosaics. The Part A photographs can be reused.</p>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>What were the RANSAC settings?</h4><p class="prompt">Record the inlier threshold, the iteration count, and how many inliers each mosaic kept. Do not paste the fitted matrix until you have computed it.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Mosaic 1 · manual and automatic</b><code>Side-by-side comparison</code></div></div><figcaption><span class="fig">FIG B4.1</span>Mosaic 1. Manual stitch beside the automatic stitch.</figcaption></figure>
-<figure><div class="media-slot empty"><div class="missing"><b>Mosaic 2 · manual and automatic</b><code>Side-by-side comparison</code></div></div><figcaption><span class="fig">FIG B4.2</span>Mosaic 2. Manual stitch beside the automatic stitch.</figcaption></figure>
-<figure><div class="media-slot empty"><div class="missing"><b>Mosaic 3 · manual and automatic</b><code>Side-by-side comparison</code></div></div><figcaption><span class="fig">FIG B4.3</span>Mosaic 3. Manual stitch beside the automatic stitch.</figcaption></figure>
+<section id="descriptors">
+<div class="part-header"><span class="kicker">PART B · 02</span><h2>Feature Descriptors</h2></div>
+<section class="subsection" id="b2"><div class="sub-side"><div class="num">B.2</div><h3>Normalized Patches</h3></div><div>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic1_descriptors.png"><img src="proj4/results_b/mosaic1_descriptors.png" alt="Eight grayscale feature descriptors for pair 1." width="1425" height="178" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B2.1</span>Pair 1 · Eight normalized 8 × 8 patches from the source photo.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic2_descriptors.png"><img src="proj4/results_b/mosaic2_descriptors.png" alt="Eight grayscale feature descriptors for pair 2." width="1425" height="178" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B2.2</span>Pair 2 · Eight normalized 8 × 8 patches from the source photo.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic3_descriptors.png"><img src="proj4/results_b/mosaic3_descriptors.png" alt="Eight grayscale feature descriptors for pair 3." width="1425" height="178" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B2.3</span>Pair 3 · Eight normalized 8 × 8 patches from the source photo.</figcaption>
+</figure>
 </div></section>
 </section>
-<section id="auto-extra"><div class="part-header"><span class="kicker">PART B · 05</span><h2>Bells and Whistles</h2></div>
-<section class="subsection" id="b5"><div class="sub-side"><div class="num">B.5</div><h3>One Extension</h3><div class="keys"><span class="key">Extra for CS180</span><span class="key">Required for CS280A</span></div></div><div>
-<p class="prose">Pick one: multi-scale corners and descriptors, rotation-invariant descriptors, or panorama recognition from an unordered set of images.</p>
-<div class="answer-block"><div class="answer-label">YOUR WRITE-UP</div><h4>Which extension, and what changed?</h4><p class="prompt">Name the option you tried and add the figure that shows it. Leave this section empty if you skip the extra credit.</p></div>
-<figure><div class="media-slot empty"><div class="missing"><b>Add the extension figure</b><code>Only if you do B.5</code></div></div><figcaption><span class="fig">FIG B5.1</span>Result of the chosen extension.</figcaption></figure>
+<section id="matching">
+<div class="part-header"><span class="kicker">PART B · 03</span><h2>Feature Matching</h2></div>
+<section class="subsection" id="b3"><div class="sub-side"><div class="num">B.3</div><h3>Lowe Ratio Test</h3><div class="keys"><span class="key">Ratio threshold 0.75</span></div></div><div>
+<p class="prose">Green lines show RANSAC inliers. Orange lines show rejected matches.</p>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic1_matches.png"><img src="proj4/results_b/mosaic1_matches.png" alt="Feature matches for pair 1, with green inliers and orange rejected matches." width="1255" height="870" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B3.1</span>Pair 1 · 13 of 18 candidate matches kept by RANSAC.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic2_matches.png"><img src="proj4/results_b/mosaic2_matches.png" alt="Feature matches for pair 2, with green inliers and orange rejected matches." width="1425" height="731" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B3.2</span>Pair 2 · 51 of 77 candidate matches kept by RANSAC.</figcaption>
+</figure>
+<figure>
+  <div class="img-wrap"><a href="proj4/results_b/mosaic3_matches.png"><img src="proj4/results_b/mosaic3_matches.png" alt="Feature matches for pair 3, with green inliers and orange rejected matches." width="783" height="870" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B3.3</span>Pair 3 · 49 of 52 candidate matches kept by RANSAC.</figcaption>
+</figure>
+</div></section>
+</section>
+<section id="ransac">
+<div class="part-header"><span class="kicker">PART B · 04</span><h2>Automatic Mosaics</h2></div>
+<section class="subsection" id="b4"><div class="sub-side"><div class="num">B.4</div><h3>Four-Point RANSAC</h3></div><div>
+<p class="prose">The three mosaics use different pairings of the same building photos. Black borders mark areas outside both source images.</p>
+<figure id="b4-mosaic1">
+  <div class="img-wrap"><a href="proj4/results_b/mosaic1_mosaics.png"><img src="proj4/results_b/mosaic1_mosaics.png" alt="Three side-by-side stitches for mosaic 1, labeled Manual, Automatic, and Multiscale." width="1773" height="566" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B4.1</span>Mosaic 1 · Manual, single-scale automatic, and multiscale automatic.</figcaption>
+</figure>
+<figure id="b4-mosaic2">
+  <div class="img-wrap"><a href="proj4/results_b/mosaic2_mosaics.png"><img src="proj4/results_b/mosaic2_mosaics.png" alt="Three side-by-side stitches for mosaic 2, labeled Manual, Automatic, and Multiscale." width="1773" height="595" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B4.2</span>Mosaic 2 · Manual, single-scale automatic, and multiscale automatic.</figcaption>
+</figure>
+<figure id="b4-mosaic3">
+  <div class="img-wrap"><a href="proj4/results_b/mosaic3_mosaics.png"><img src="proj4/results_b/mosaic3_mosaics.png" alt="Three side-by-side stitches for mosaic 3, labeled Manual, Automatic, and Multiscale." width="1686" height="639" loading="lazy" decoding="async"></a></div>
+  <figcaption><span class="fig">FIG B4.3</span>Mosaic 3 · Manual, single-scale automatic, and multiscale automatic.</figcaption>
+</figure>
+</div></section>
+</section>
+<section id="auto-extra">
+<div class="part-header"><span class="kicker">PART B · 05</span><h2>Bells and Whistles</h2></div>
+<section class="subsection" id="b5"><div class="sub-side"><div class="num">B.5</div><h3>Multiscale Autostitching</h3></div><div>
+<p class="prose">The right panel of each comparison shows the multiscale result. See <a href="#b4-mosaic1">Mosaic 1</a> (64 of 66 inliers), <a href="#b4-mosaic2">Mosaic 2</a> (149 of 170), and <a href="#b4-mosaic3">Mosaic 3</a> (49 of 52).</p>
 </div></section>
 </section>
 <div class="next"><a href="project3.html"><small>← PREVIOUS</small><b>Project 3: Flow Models</b></a><a href="index.html"><small>BACK TO →</small><b>All Projects</b></a></div>
